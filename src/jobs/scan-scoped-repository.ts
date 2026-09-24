@@ -96,6 +96,5 @@ console.log(JSON.stringify({
   versionConstraint: constraint,
   filesDiscovered: files.length,
   solidityFiles: solidity.length,
-  findings: findings.length,
   findings
 }, null, 2));
