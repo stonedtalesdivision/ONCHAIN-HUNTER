@@ -20,7 +20,7 @@ const PATTERNS = [
   { id: "tx-origin", title: "tx.origin used in authorization-sensitive code", category: "access-control", severity: "high" as Severity, base: 0.82, re: /\btx\.origin\b/ },
   { id: "selfdestruct", title: "selfdestruct usage", category: "destructive-operation", severity: "high" as Severity, base: 0.72, re: /\bselfdestruct\s*\(/ },
   { id: "delegatecall", title: "delegatecall usage", category: "external-call", severity: "medium" as Severity, base: 0.62, re: /\.delegatecall\s*\(/ },
-  { id: "low-level-call", title: "Low-level external call", category: "external-call", severity: "medium" as Severity, base: 0.55, re: /\.(call|callcode|staticcall)\s*\(/ },
+  { id: "low-level-call", title: "Low-level external call", category: "external-call", severity: "medium" as Severity, base: 0.55, re: /\.(call|callcode|staticcall)\s*(?:\{|\()/ },
   { id: "timestamp", title: "block.timestamp used", category: "time-dependence", severity: "low" as Severity, base: 0.42, re: /\bblock\.timestamp\b/ }
 ];
 
