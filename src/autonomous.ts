@@ -72,7 +72,7 @@ createServer(async (req, res) => {
       if (!body.id || !body.programId || !body.title || !body.status) {
         return json(res, 400, { error: "id, programId, title and status are required" });
       }
-      if (!["submitted", "accepted", "paid", "rejected"].includes(body.status)) {
+      if (!["candidate", "validated", "submitted", "accepted", "paid", "rejected"].includes(body.status)) {
         return json(res, 400, { error: "invalid status" });
       }
       const entries = await upsertLedgerEntry({
