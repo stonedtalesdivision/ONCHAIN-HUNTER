@@ -17,7 +17,8 @@
     "validate:run": "tsx src/jobs/run-validation.ts",
     "report:generate": "tsx src/jobs/generate-report.ts",
     "sync:versions": "tsx src/jobs/sync-version-scopes.ts",
-    "hunt": "tsx src/jobs/run-hunt.ts"
+    "hunt": "tsx src/jobs/run-hunt.ts",
+    "dashboard": "tsx src/dashboard.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.2",
