@@ -44,7 +44,7 @@ jobs:
             test -s /tmp/onchain-hunter-health.json
 
             echo "Checking ONCHAIN-HUNTER status API..."
-            status_code="$(curl -sS -o /tmp/onchain-hunter-status.json -w '%{http_code}' http://127.0.0.1:3200/api/status)"
+            status_code="$(curl -sS -o /tmp/onchain-hunter-status.json -w '%{http_code}' http://127.0.0.1:3200/api/status || true)"
             cat /tmp/onchain-hunter-status.json
             test "$status_code" = "200" || test "$status_code" = "401"
 
