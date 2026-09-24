@@ -28,6 +28,5 @@ console.log(JSON.stringify({
   commitSha: revision?.commitSha ?? null,
   filesDiscovered: files.length,
   solidityFiles: solidity.length,
-  findings: findings.length,
   findings
 }, null, 2));
