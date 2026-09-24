@@ -32,3 +32,21 @@ jobs:
             pm2 start ecosystem.config.cjs --only onchain-hunter --update-env
             pm2 save
             pm2 startup systemd -u root --hp /root >/tmp/onchain-hunter-pm2-startup.txt 2>&1 || true
+
+            echo "Checking ONCHAIN-HUNTER service..."
+            for i in {1..12}; do
+              if curl -fsS http://127.0.0.1:3200/api/health >/tmp/onchain-hunter-health.json; then
+                cat /tmp/onchain-hunter-health.json
+                break
+              fi
+              sleep 2
+            done
+            test -s /tmp/onchain-hunter-health.json
+
+            echo "Checking ONCHAIN-HUNTER status API..."
+            curl -fsS http://127.0.0.1:3200/api/status >/tmp/onchain-hunter-status.json
+            cat /tmp/onchain-hunter-status.json
+
+            echo "Checking public HTTPS endpoint..."
+            curl -fsS --retry 5 --retry-delay 2 https://hunter.texvic.tech/api/health >/tmp/onchain-hunter-public-health.json
+            cat /tmp/onchain-hunter-public-health.json
