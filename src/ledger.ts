@@ -1,7 +1,7 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 
-export type BountyLedgerStatus = "submitted" | "accepted" | "paid" | "rejected";
+export type BountyLedgerStatus = "candidate" | "validated" | "submitted" | "accepted" | "paid" | "rejected";
 
 export type BountyLedgerEntry = {
   id: string;
