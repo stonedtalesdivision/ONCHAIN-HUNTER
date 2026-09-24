@@ -25,8 +25,6 @@ async function main(): Promise<void> {
   outer:
   for (const program of programs.filter(p => p.status === "active")) {
     for (const repository of program.sourceRepos) {
-      if (attemptedRepositories >= limit) break outer;
-      attemptedRepositories++;
       const constraint = inferVersionConstraint(program);
       const ref = requiredScanRef(constraint);
       if (!ref) {
@@ -34,6 +32,8 @@ async function main(): Promise<void> {
         candidates.push({ type: "scope-review-required", programId: program.id, programName: program.name, repository, reason: "No exact release/commit was exposed by the current catalog data." });
         continue;
       }
+      if (attemptedRepositories >= limit) break outer;
+      attemptedRepositories++;
 
       console.log(JSON.stringify({ event: "scan-start", programId: program.id, repository, ref }));
       try {
