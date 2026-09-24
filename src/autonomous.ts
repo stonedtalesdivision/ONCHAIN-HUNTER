@@ -12,19 +12,28 @@ const artifact = join(root, "artifacts", "hunt", "latest.json");
 const page = join(root, "dashboard", "index.html");
 let active: ChildProcess | null = null;
 let lastStartedAt: string | null = null;
+let lastExitCode: number | null = null;
+let lastError: string | null = null;
 
 async function runHunt(): Promise<boolean> {
   if (active) return false;
   await mkdir(join(root, "artifacts", "hunt"), { recursive: true });
   lastStartedAt = new Date().toISOString();
-  active = spawn(process.execPath, [join(root, "dist", "jobs", "run-hunt.js")], {
+  const job = join(root, "dist", "jobs", "run-hunt.js");
+  active = spawn(process.execPath, [job], {
     cwd: root,
     env: { ...process.env, ONCHAIN_HUNTER_LIMIT: String(limit) },
     stdio: ["ignore", "pipe", "pipe"]
   });
+  active.on("error", error => {
+    lastError = error instanceof Error ? error.message : String(error);
+    console.error(JSON.stringify({ event: "hunt-spawn-error", error: lastError }));
+    active = null;
+  });
   active.stdout?.on("data", d => process.stdout.write(d));
   active.stderr?.on("data", d => process.stderr.write(d));
   active.on("close", code => {
+    lastExitCode = code;
     console.log(JSON.stringify({ event: "hunt-exit", code }));
     active = null;
   });
@@ -40,12 +49,23 @@ createServer(async (req, res) => {
   try {
     if (req.method === "POST" && req.url === "/api/hunt") {
       const started = await runHunt();
-      return json(res, 200, { started, running: Boolean(active), lastStartedAt, intervalMinutes, limit });
+      return json(res, started ? 202 : 409, {
+        started,
+        running: Boolean(active),
+        lastStartedAt,
+        lastExitCode,
+        lastError,
+        intervalMinutes,
+        limit
+      });
+    }
+    if (req.method === "GET" && req.url === "/api/health") {
+      return json(res, 200, { ok: true, running: Boolean(active), lastStartedAt, lastExitCode, lastError });
     }
     if (req.url?.startsWith("/api/status")) {
       let hunt: unknown = null;
       try { hunt = JSON.parse(await readFile(artifact, "utf8")); } catch {}
-      return json(res, 200, { running: Boolean(active), lastStartedAt, intervalMinutes, limit, hunt });
+      return json(res, 200, { running: Boolean(active), lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt });
     }
     if (req.url?.startsWith("/api/hunt")) {
       let body: unknown = { programsDiscovered: 0, scannedRepositories: 0, candidateFindings: 0, skippedRepositories: 0, attemptedRepositories: 0, rateLimited: false, results: [] };
