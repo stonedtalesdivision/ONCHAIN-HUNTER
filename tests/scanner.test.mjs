@@ -47,3 +47,17 @@ test("filters ordinary self-call plumbing", () => {
   );
   assert.equal(findings.length, 0);
 });
+
+test("extracts contextual reachability and target-control evidence", () => {
+  const findings = scanSoliditySource(
+    'function execute(address targetContract, bytes calldata calldataPayload) external onlyOwner {\n' +
+    '  (success, response) = targetContract.delegatecall(calldataPayload);\n' +
+    '}',
+    "Storage.sol"
+  );
+  assert.equal(findings.length, 1);
+  assert.ok(findings[0].evidence.some(x => x.includes("context.function=execute")));
+  assert.ok(findings[0].evidence.some(x => x.includes("context.reachability=restricted")));
+  assert.ok(findings[0].evidence.some(x => x.includes("context.accessControl=true")));
+  assert.ok(findings[0].evidence.some(x => x.includes("context.targetControl=user-influenced")));
+});
