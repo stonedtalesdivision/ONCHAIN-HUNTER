@@ -31,3 +31,19 @@ test("keeps production Solidity candidates", () => {
   assert.equal(findings.length, 1);
   assert.equal(findings[0].category, "external-call");
 });
+
+test("filters ordinary expiry timestamp checks", () => {
+  const findings = scanSoliditySource(
+    'require(order.validTo >= block.timestamp, "expired");',
+    "Settlement.sol"
+  );
+  assert.equal(findings.length, 0);
+});
+
+test("filters ordinary self-call plumbing", () => {
+  const findings = scanSoliditySource(
+    "(, response) = address(this).call(innerCall);",
+    "StorageAccessible.sol"
+  );
+  assert.equal(findings.length, 0);
+});
