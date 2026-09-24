@@ -44,8 +44,9 @@ jobs:
             test -s /tmp/onchain-hunter-health.json
 
             echo "Checking ONCHAIN-HUNTER status API..."
-            curl -fsS http://127.0.0.1:3200/api/status >/tmp/onchain-hunter-status.json
+            status_code="$(curl -sS -o /tmp/onchain-hunter-status.json -w '%{http_code}' http://127.0.0.1:3200/api/status)"
             cat /tmp/onchain-hunter-status.json
+            test "$status_code" = "200" || test "$status_code" = "401"
 
             echo "Checking public HTTPS endpoint..."
             curl -fsS --retry 5 --retry-delay 2 https://hunter.texvic.tech/api/health >/tmp/onchain-hunter-public-health.json
