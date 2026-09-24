@@ -17,7 +17,13 @@ function splitRepository(repository: string): [string,string] {
 }
 
 async function githubFetch(url: string, token?: string): Promise<Response> {
-  return fetch(url, { headers: headers(token), signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+  const response = await fetch(url, { headers: headers(token), signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+  if (response.status === 403 && response.headers.get("x-ratelimit-remaining") === "0") {
+    const reset = response.headers.get("x-ratelimit-reset");
+    const resetAt = reset ? new Date(Number(reset) * 1000).toISOString() : "unknown";
+    throw new Error("GitHub API rate limit exhausted; reset at " + resetAt);
+  }
+  return response;
 }
 
 export async function resolveRepositoryRevision(repository: string, ref: string, token?: string): Promise<GitHubRevision> {
