@@ -126,7 +126,7 @@ function shouldReport(ruleId: string, lines: string[], i: number, assessment: Co
   if (ruleId === "timestamp") {
     return /\b(random|lottery|raffle|seed|secret|nonce)\b/i.test(window)
       || /\b(?:keccak256|sha256|abi\.encodePacked)\s*\([^)]*block\.timestamp/i.test(window)
-      || /\b(?:block\.timestamp)[^;\n]*(?:%|\^|\*|/)\s*\d+/i.test(window);
+      || /\b(?:block\.timestamp)[^;\n]*(?:%|\^|\*|\/)\s*\d+/i.test(window);
   }
   if (ruleId === "tx-origin") {
     return assessment.reachability !== "unknown"
