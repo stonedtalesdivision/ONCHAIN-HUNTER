@@ -75,6 +75,17 @@ function assessContext(lines: string[], i: number, ruleId: string): ContextAsses
   };
 }
 
+function isRevertingSimulationWrapper(lines: string[], i: number, ruleId: string): boolean {
+  if (ruleId !== "delegatecall") return false;
+  const start = Math.max(0, i - 20);
+  const end = Math.min(lines.length, i + 20);
+  const window = lines.slice(start, end).join("\n");
+  return /function\s+simulate[A-Za-z0-9_]*\s*\([^)]*\)[^{]*\{/.test(window)
+    && /\.delegatecall\s*\(/.test(window)
+    && /\brevertWith\s*\(/.test(window)
+    && /function\s+revertWith\s*\([^)]*\)[^{]*\{/.test(lines.join("\n"));
+}
+
 function contextScore(ruleId: string, lines: string[], i: number): number {
   const window = lines.slice(Math.max(0, i - 4), Math.min(lines.length, i + 5)).join("\n");
   let score = 0;
@@ -97,6 +108,7 @@ export function scanSoliditySource(source: string, file = "unknown.sol"): Opport
       if (isComment(line) || !rule.re.test(line)) continue;
       if (rule.id === "timestamp" && isBenignTimestampCheck(line, lines, i)) continue;
       if (rule.id === "low-level-call" && isBenignSelfCall(line, lines, i)) continue;
+      if (isRevertingSimulationWrapper(lines, i, rule.id)) continue;
       const confidence = Math.max(0.05, Math.min(0.99, rule.base + contextScore(rule.id, lines, i)));
       const candidate: Candidate = { id: rule.id, title: rule.title, category: rule.category, severity: rule.severity, confidence, line: i + 1, text: line.trim(), rationale: "Static candidate requiring contextual review; confidence is heuristic." };
       const assessment = assessContext(lines, i, rule.id);
