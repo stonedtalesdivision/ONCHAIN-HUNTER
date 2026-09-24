@@ -46,3 +46,24 @@ Normalizer -> Opportunity queue -> Code analysis -> Local validation
 - **Safety boundary**: scanning is limited to repositories/assets explicitly associated with a bounty program. The scanner does not exploit live contracts, submit transactions, brute-force keys, or access private credentials.
 
 The next stage is authorized repository ingestion: fetch only the source repositories explicitly listed by a bounty program, scan Solidity/EVM code, attach file/line evidence, and keep findings tied to the relevant program scope.
+
+
+## Private dashboard and payout configuration
+
+The production dashboard should be protected at the Nginx layer. Nginx supports HTTP Basic Authentication using a password file; credentials are never stored in this repository. Use `scripts/secure-dashboard.sh` on the VPS to enable it for `hunter.texvic.tech`. The script creates a backup before changing the Nginx site configuration and validates the configuration before reload. See the official Nginx documentation for Basic Authentication. 
+
+For bounty payouts, configure only your **public receiving wallet address** in the VPS `.env`:
+- `PAYOUT_WALLET_ADDRESS`: your public wallet address
+- `PAYOUT_NETWORK`: network the receiving address uses
+- `PAYOUT_ASSET`: preferred payout asset, such as USDC
+
+Never put a seed phrase, private key, signing key, exchange password, or other secret in `.env.example`, GitHub, or the dashboard. A configured wallet address does not force a bounty program to pay; each program's own payout and KYC rules control whether and how a reward is paid. For example, Immunefi program pages specify their own payout terms and may require KYC. 
+
+### Enable private access on the VPS
+
+```bash
+cd /root/ONCHAIN-HUNTER
+bash scripts/secure-dashboard.sh hunter.texvic.tech
+```
+
+After authentication is enabled, both the dashboard and its API endpoints are protected by the same Nginx gate.
