@@ -73,11 +73,12 @@ createServer(async (req, res) => {
       return json(res, 200, { entries: await readLedger() });
     }
     if (req.method === "POST" && req.url === "/api/ledger") {
-      const body = await readJsonBody(req) as Partial<BountyLedgerEntry>;
+      const body = await readJsonBody(req) as Record<string, unknown>;
       if (!body.id || !body.programId || !body.title || !body.status) {
         return json(res, 400, { error: "id, programId, title and status are required" });
       }
-      if (!["candidate", "validated", "submitted", "accepted", "paid", "rejected"].includes(body.status)) {
+      const status = body.status;
+      if (typeof status !== "string" || !["candidate", "validated", "submitted", "accepted", "paid", "rejected"].includes(status)) {
         return json(res, 400, { error: "invalid status" });
       }
       const entries = await upsertLedgerEntry({
@@ -86,9 +87,9 @@ createServer(async (req, res) => {
         programId: String(body.programId),
         programName: body.programName ? String(body.programName) : undefined,
         title: String(body.title),
-        status: body.status,
+        status: status as BountyLedgerEntry["status"],
         severity: body.severity ? String(body.severity) : undefined,
-        amount: body.amount == null || body.amount === "" ? undefined : Number(body.amount),
+        amount: typeof body.amount === "number" && Number.isFinite(body.amount) ? body.amount : undefined,
         currency: body.currency ? String(body.currency) : undefined,
         network: body.network ? String(body.network) : undefined,
         walletAddress: body.walletAddress ? String(body.walletAddress) : undefined,
