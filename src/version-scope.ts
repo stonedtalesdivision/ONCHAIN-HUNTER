@@ -29,4 +29,7 @@ export function isRepositoryRefEligible(ref: string, constraint: VersionConstrai
   if (constraint.requiredRelease) return ref === constraint.requiredRelease || ref === ("v" + constraint.requiredRelease.replace(/^v/, ""));
   return "unknown";
 }
-\nexport function requiredScanRef(constraint: VersionConstraint): string | undefined {\n  return constraint.requiredCommit ?? constraint.requiredRelease;\n}\n
+
+export function requiredScanRef(constraint: VersionConstraint): string | undefined {
+  return constraint.requiredCommit ?? constraint.requiredRelease;
+}
