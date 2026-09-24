@@ -4,6 +4,7 @@ import { inferVersionConstraintForRepository, requiredScanRef } from "../version
 import { resolveRepositoryRevision, listRepositoryFiles, fetchRawFile } from "../github.js";
 import { scanSoliditySource } from "../scanner.js";
 import { writeFile, mkdir } from "node:fs/promises";
+import { payoutRoutesForProgram } from "../payout.js";
 
 async function main(): Promise<void> {
   const hasToken = Boolean(process.env.GITHUB_TOKEN);
@@ -17,6 +18,11 @@ async function main(): Promise<void> {
   console.log(JSON.stringify({ event: "catalog-loaded", programsDiscovered: programs.length }));
 
   const candidates: unknown[] = [];
+  const payoutConfiguration = programs.filter(p => p.status === "active").map(program => ({
+    programId: program.id,
+    programName: program.name,
+    routes: payoutRoutesForProgram(program)
+  }));
   let scannedRepositories = 0;
   let skippedRepositories = 0;
   let attemptedRepositories = 0;
@@ -54,6 +60,7 @@ async function main(): Promise<void> {
               repository,
               sourceRevision: revision.commitSha,
               scopeMatch: "yes",
+              payoutRoutes: payoutRoutesForProgram(program),
               evidence: [`program: ${program.id}`, `repository: ${repository}`, `revision: ${revision.commitSha}`, ...finding.evidence]
             });
           }
@@ -86,6 +93,7 @@ async function main(): Promise<void> {
     rateLimited,
     skippedRepositories,
     candidateFindings: candidates.filter((x: any) => !x.type).length,
+    payoutConfiguration,
     results: candidates
   };
   await writeFile(path, JSON.stringify(result, null, 2), "utf8");
