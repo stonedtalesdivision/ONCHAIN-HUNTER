@@ -9,7 +9,8 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "npm run build && node --test",
-    "sync:bounties": "tsx src/jobs/sync-bounties.ts"
+    "sync:bounties": "tsx src/jobs/sync-bounties.ts",
+    "scan:repo": "tsx src/jobs/scan-repository.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.2",
