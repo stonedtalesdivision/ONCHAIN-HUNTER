@@ -23,8 +23,8 @@ export function generateFoundryHarness(finding: Opportunity, contractName = "Tar
     "    function test_candidate_" + safe(finding.category) + "() public {",
     "        // Candidate: " + finding.title.replace(/\n/g, " "),
     "        // Finding ID: " + finding.id,
-    "        // Expected evidence: " + finding.evidence[0]?.replace(/\n/g, " "),
-    "        fail("TODO: implement a minimal local reproduction for this candidate.");",
+    "        // Expected evidence: " + (finding.evidence[0] ?? "").replace(/\n/g, " "),
+    '        fail("TODO: implement a minimal local reproduction for this candidate.");',
     "    }",
     "}"
   ].join("\n") + "\n";
