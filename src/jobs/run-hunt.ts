@@ -69,7 +69,6 @@ async function main(): Promise<void> {
           console.error(JSON.stringify({ event: "rate-limit", reason }));
           break outer;
         }
-        const reason = error instanceof Error ? error.message : String(error);
         candidates.push({ type: "scan-error", programId: program.id, repository, reason });
         console.error(JSON.stringify({ event: "scan-error", programId: program.id, repository, reason }));
       }
