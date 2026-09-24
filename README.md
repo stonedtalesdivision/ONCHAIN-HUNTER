@@ -36,3 +36,13 @@ Normalizer -> Opportunity queue -> Code analysis -> Local validation
 5. Local-only proof validation
 6. Responsible disclosure report generation
 7. Dashboard and continuous monitoring
+
+
+## Current implementation
+
+- **Immunefi discovery adapter**: pulls the public bounty catalog and normalizes active programs.
+- **Scope extraction**: extracts GitHub repository URLs when they are explicitly present in program scope/resources.
+- **Deterministic Solidity scanner**: flags candidate patterns such as `tx.origin`, `selfdestruct`, `delegatecall`, low-level calls, and timestamp dependence. Findings are candidates for human review, not automatic vulnerability claims.
+- **Safety boundary**: scanning is limited to repositories/assets explicitly associated with a bounty program. The scanner does not exploit live contracts, submit transactions, brute-force keys, or access private credentials.
+
+The next stage is authorized repository ingestion: fetch only the source repositories explicitly listed by a bounty program, scan Solidity/EVM code, attach file/line evidence, and keep findings tied to the relevant program scope.
