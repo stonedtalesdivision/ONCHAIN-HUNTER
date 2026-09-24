@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/autonomous.js",
     "test": "npm run build && node --test",
     "sync:bounties": "tsx src/jobs/sync-bounties.ts",
     "scan:repo": "tsx src/jobs/scan-repository.ts",
@@ -18,7 +18,8 @@
     "report:generate": "tsx src/jobs/generate-report.ts",
     "sync:versions": "tsx src/jobs/sync-version-scopes.ts",
     "hunt": "tsx src/jobs/run-hunt.ts",
-    "dashboard": "tsx src/dashboard.ts"
+    "dashboard": "tsx src/dashboard.ts",
+    "autonomous": "tsx src/autonomous.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.2",
