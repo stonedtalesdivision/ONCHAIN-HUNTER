@@ -15,6 +15,7 @@ let active: ChildProcess | null = null;
 let lastStartedAt: string | null = null;
 let lastExitCode: number | null = null;
 let lastError: string | null = null;
+let retryTimer: NodeJS.Timeout | null = null;
 
 async function runHunt(): Promise<boolean> {
   if (active) return false;
@@ -35,8 +36,12 @@ async function runHunt(): Promise<boolean> {
   active.stderr?.on("data", d => process.stderr.write(d));
   active.on("close", code => {
     lastExitCode = code;
+    if (code !== 0) lastError = "Hunt exited with code " + code;
     console.log(JSON.stringify({ event: "hunt-exit", code }));
     active = null;
+    if (code !== 0 && !retryTimer) {
+      retryTimer = setTimeout(() => { retryTimer = null; void runHunt(); }, 5 * 60_000);
+    }
   });
   return true;
 }
