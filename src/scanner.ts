@@ -18,6 +18,15 @@ function isComment(line: string): boolean {
   return t.startsWith("//") || t.startsWith("*") || t.startsWith("/*") || t.endsWith("*/");
 }
 
+function isLikelyNonProductionFile(file: string): boolean {
+  const normalized = file.replace(/\\/g, "/").toLowerCase();
+  const parts = normalized.split("/");
+  const base = parts.at(-1) ?? normalized;
+  return parts.some(p => ["test", "tests", "mock", "mocks", "fixture", "fixtures"].includes(p))
+    || /(?:test|tests|mock|fixture)(?:interface)?\.sol$/.test(base)
+    || /testinterface\.sol$/.test(base);
+}
+
 function contextScore(ruleId: string, lines: string[], i: number): number {
   const window = lines.slice(Math.max(0, i - 4), Math.min(lines.length, i + 5)).join("\n");
   let score = 0;
@@ -31,6 +40,7 @@ function contextScore(ruleId: string, lines: string[], i: number): number {
 }
 
 export function scanSoliditySource(source: string, file = "unknown.sol"): Opportunity[] {
+  if (isLikelyNonProductionFile(file)) return [];
   const lines = source.split(/\r?\n/);
   const findings: Opportunity[] = [];
   for (const rule of PATTERNS) {
