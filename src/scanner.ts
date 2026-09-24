@@ -94,15 +94,45 @@ function isRevertingSimulationWrapper(lines: string[], i: number, ruleId: string
 }
 
 function contextScore(ruleId: string, lines: string[], i: number): number {
-  const window = lines.slice(Math.max(0, i - 4), Math.min(lines.length, i + 5)).join("\n");
+  const window = lines.slice(Math.max(0, i - 8), Math.min(lines.length, i + 9)).join("\n");
   let score = 0;
-  if (/\b(require|revert|assert)\s*\(/.test(window)) score += 0.06;
-  if (/\b(owner|admin|role|authorized|only[A-Z]\w*)\b/.test(window)) score += 0.08;
-  if (ruleId === "tx-origin" && /\b(owner|admin|authorized|only[A-Z])/.test(window)) score += 0.08;
-  if (ruleId === "delegatecall" && /\b(address\s+)?(target|implementation|module|plugin)\b/.test(window)) score += 0.06;
-  if (ruleId === "low-level-call" && /\b(bool|success|ok)\b/.test(window)) score -= 0.12;
-  if (ruleId === "timestamp" && /\b(random|lottery|raffle|seed|secret|nonce)\b/i.test(window)) score += 0.12;
+  if (/\b(require|revert|assert)\s*\(/.test(window)) score += 0.04;
+  if (/\b(owner|admin|role|authorized|only[A-Z]\w*)\b/.test(window)) score += 0.06;
+  if (ruleId === "tx-origin") {
+    if (/\b(require|revert|assert)\s*\([^)]*\btx\.origin\b/.test(window)) score += 0.12;
+    if (/\b(owner|admin|authorized|only[A-Z])/.test(window)) score += 0.08;
+    if (/\b(msg\.sender|tx\.origin)\b[^;\n]*(?:==|!=)/.test(window)) score += 0.05;
+  }
+  if (ruleId === "selfdestruct") {
+    if (/\b(owner|admin|authorized|only[A-Z]\w*)\b/.test(window)) score -= 0.04;
+    if (/\b(?:external|public)\b/.test(window) && !/\b(?:only[A-Z]\w*|onlyOwner|onlyAdmin)\b/.test(window)) score += 0.12;
+  }
+  if (ruleId === "delegatecall") {
+    if (/\b(address\s+)?(target|implementation|module|plugin)\b/.test(window)) score += 0.06;
+    if (/\b(?:msg\.sender|user|caller|targetContract)\b/.test(window)) score += 0.08;
+    if (/\b(?:bytes\s+(?:calldata|memory)|calldataPayload|data)\b/.test(window)) score += 0.04;
+  }
+  if (ruleId === "low-level-call") {
+    if (/\b(bool|success|ok)\b/.test(window)) score -= 0.10;
+    if (/\b(?:value|amount|msg\.value)\b/.test(window) && /\.call\s*\{/.test(window)) score += 0.10;
+    if (/\b(?:target|recipient|to|destination)\b/.test(window) && /\b(?:msg\.sender|user|caller)\b/.test(window)) score += 0.08;
+  }
+  if (ruleId === "timestamp" && /\b(random|lottery|raffle|seed|secret|nonce)\b/i.test(window)) score += 0.18;
   return score;
+}
+
+function shouldReport(ruleId: string, lines: string[], i: number, assessment: ContextAssessment): boolean {
+  const window = lines.slice(Math.max(0, i - 8), Math.min(lines.length, i + 9)).join("\n");
+  if (ruleId === "timestamp") {
+    return /\b(random|lottery|raffle|seed|secret|nonce)\b/i.test(window)
+      || /\b(?:keccak256|sha256|abi\.encodePacked)\s*\([^)]*block\.timestamp/i.test(window)
+      || /\b(?:block\.timestamp)[^;\n]*(?:%|\^|\*|/)\s*\d+/i.test(window);
+  }
+  if (ruleId === "tx-origin") {
+    return assessment.reachability !== "unknown"
+      || /\b(?:require|revert|assert)\s*\([^)]*tx\.origin\b/i.test(window);
+  }
+  return true;
 }
 
 export function scanSoliditySource(source: string, file = "unknown.sol"): Opportunity[] {
@@ -116,9 +146,10 @@ export function scanSoliditySource(source: string, file = "unknown.sol"): Opport
       if (rule.id === "timestamp" && isBenignTimestampCheck(line, lines, i)) continue;
       if (rule.id === "low-level-call" && isBenignSelfCall(line, lines, i)) continue;
       if (isRevertingSimulationWrapper(lines, i, rule.id)) continue;
+      const assessment = assessContext(lines, i, rule.id);
+      if (!shouldReport(rule.id, lines, i, assessment)) continue;
       const confidence = Math.max(0.05, Math.min(0.99, rule.base + contextScore(rule.id, lines, i)));
       const candidate: Candidate = { id: rule.id, title: rule.title, category: rule.category, severity: rule.severity, confidence, line: i + 1, text: line.trim(), rationale: "Static candidate requiring contextual review; confidence is heuristic." };
-      const assessment = assessContext(lines, i, rule.id);
       findings.push({
         id: `static:${candidate.id}:${file}:${candidate.line}`,
         programId: "unknown", title: candidate.title, category: candidate.category,
