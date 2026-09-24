@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { ImmunefiBountySource } from "../sources/immunefi.js";
-import { inferVersionConstraint, requiredScanRef } from "../version-scope.js";
+import { inferVersionConstraintForRepository, requiredScanRef } from "../version-scope.js";
 import { resolveRepositoryRevision, listRepositoryFiles, fetchRawFile } from "../github.js";
 import { scanSoliditySource } from "../scanner.js";
 import { writeFile, mkdir } from "node:fs/promises";
@@ -25,7 +25,7 @@ async function main(): Promise<void> {
   outer:
   for (const program of programs.filter(p => p.status === "active")) {
     for (const repository of program.sourceRepos) {
-      const constraint = inferVersionConstraint(program);
+      const constraint = inferVersionConstraintForRepository(program, repository);
       const ref = requiredScanRef(constraint);
       if (!ref) {
         skippedRepositories++;
