@@ -5,13 +5,22 @@ import { resolveRepositoryRevision, listRepositoryFiles, fetchRawFile } from "..
 import { scanSoliditySource } from "../scanner.js";
 import { writeFile, mkdir } from "node:fs/promises";
 
-const limit = Math.max(1, Number(process.env.ONCHAIN_HUNTER_LIMIT ?? "5"));
+const hasToken = Boolean(process.env.GITHUB_TOKEN);
+const configuredLimit = Number(process.env.ONCHAIN_HUNTER_LIMIT ?? (hasToken ? "5" : "1"));
+const limit = Math.max(1, Math.min(configuredLimit, 20));
 const token = process.env.GITHUB_TOKEN;
 const source = new ImmunefiBountySource();
 const programs = await source.discover();
 const candidates: unknown[] = [];
 let scannedRepositories = 0;
 let skippedRepositories = 0;
+
+console.log(JSON.stringify({
+  event: "hunt-start",
+  programsDiscovered: programs.length,
+  repositoryLimit: limit,
+  authenticatedGitHub: hasToken
+}));
 
 outer:
 for (const program of programs.filter(p => p.status === "active")) {
@@ -31,14 +40,18 @@ for (const program of programs.filter(p => p.status === "active")) {
       continue;
     }
 
+    console.log(JSON.stringify({ event: "scan-start", programId: program.id, repository, ref }));
+
     try {
       const revision = await resolveRepositoryRevision(repository, ref, token);
       const files = await listRepositoryFiles(repository, token, ref);
       const solidity = files.filter(f => /\.(sol|vy)$/i.test(f.path));
+      let repoFindings = 0;
       for (const file of solidity) {
         if (!file.download_url) continue;
         const sourceText = await fetchRawFile(file.download_url, token);
         for (const finding of scanSoliditySource(sourceText, file.path)) {
+          repoFindings++;
           candidates.push({
             ...finding,
             id: `${program.id}:${repository}:${revision.commitSha}:${finding.id}`,
@@ -46,24 +59,17 @@ for (const program of programs.filter(p => p.status === "active")) {
             repository,
             sourceRevision: revision.commitSha,
             scopeMatch: "yes",
-            evidence: [
-              `program: ${program.id}`,
-              `repository: ${repository}`,
-              `revision: ${revision.commitSha}`,
-              ...finding.evidence
-            ]
+            evidence: [`program: ${program.id}`, `repository: ${repository}`, `revision: ${revision.commitSha}`, ...finding.evidence]
           });
         }
       }
       scannedRepositories++;
+      console.log(JSON.stringify({ event: "scan-complete", repository, solidityFiles: solidity.length, findings: repoFindings }));
     } catch (error) {
       skippedRepositories++;
-      candidates.push({
-        type: "scan-error",
-        programId: program.id,
-        repository,
-        reason: error instanceof Error ? error.message : String(error)
-      });
+      const reason = error instanceof Error ? error.message : String(error);
+      candidates.push({ type: "scan-error", programId: program.id, repository, reason });
+      console.error(JSON.stringify({ event: "scan-error", programId: program.id, repository, reason }));
     }
   }
 }
