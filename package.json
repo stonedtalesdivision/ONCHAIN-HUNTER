@@ -11,7 +11,8 @@
     "test": "npm run build && node --test",
     "sync:bounties": "tsx src/jobs/sync-bounties.ts",
     "scan:repo": "tsx src/jobs/scan-repository.ts",
-    "validate:prepare": "tsx src/jobs/prepare-validation.ts"
+    "validate:prepare": "tsx src/jobs/prepare-validation.ts",
+    "harness:generate": "tsx src/jobs/generate-harness.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.2",
