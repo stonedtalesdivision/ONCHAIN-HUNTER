@@ -44,9 +44,13 @@ jobs:
             test -s /tmp/onchain-hunter-health.json
 
             echo "Checking ONCHAIN-HUNTER status API..."
-            status_code="$(curl -sS -o /tmp/onchain-hunter-status.json -w '%{http_code}' http://127.0.0.1:3200/api/status || true)"
+            status_code="$(curl -sS -o /tmp/onchain-hunter-status.json -w '%{http_code}' http://127.0.0.1:3200/api/status 2>/tmp/onchain-hunter-status-curl-error.log || true)"
             cat /tmp/onchain-hunter-status.json
-            test "$status_code" = "200" || test "$status_code" = "401"
+            cat /tmp/onchain-hunter-status-curl-error.log || true
+            if [ "$status_code" != "200" ] && [ "$status_code" != "401" ]; then
+              echo "Unexpected /api/status HTTP status: $status_code"
+              exit 1
+            fi
 
             echo "Checking public HTTPS endpoint..."
             curl -fsS --retry 5 --retry-delay 2 https://hunter.texvic.tech/api/health >/tmp/onchain-hunter-public-health.json
