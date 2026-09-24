@@ -71,7 +71,7 @@ function routeForNetwork(network: string, asset?: string): PayoutRoute | null {
 }
 
 export function payoutRoutesForProgram(program: BountyProgram): PayoutRoute[] {
-  const networks = program.chains.length ? program.chains : ["Program-selected network"];
+  const networks = program.chains.length ? program.chains : ["Unknown / program-selected"];
   const routes = networks.map(network => routeForNetwork(network, program.rewardCurrency)).filter((x): x is PayoutRoute => Boolean(x));
 
   if (routes.length) return [...new Map(routes.map(route => [route.network + "|" + (route.asset ?? ""), route])).values()];
@@ -81,6 +81,6 @@ export function payoutRoutesForProgram(program: BountyProgram): PayoutRoute[] {
     asset: program.rewardCurrency,
     address: undefined,
     configured: false,
-    reason: "No supported network mapping was inferred. Confirm the bounty program's payout instructions before submitting."
+    reason: "The catalog did not expose a supported payout network. Verify the program's current payout instructions before submitting."
   }];
 }
