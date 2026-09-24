@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { readFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { spawn, type ChildProcess } from "node:child_process";
+import { readLedger, upsertLedgerEntry, type BountyLedgerEntry } from "./ledger.js";
 
 const port = Number(process.env.PORT ?? process.env.DASHBOARD_PORT ?? 4173);
 const intervalMinutes = Math.max(15, Number(process.env.HUNT_INTERVAL_MINUTES ?? 60));
@@ -45,27 +46,58 @@ function json(res: import("node:http").ServerResponse, status: number, value: un
   res.end(JSON.stringify(value));
 }
 
+async function readJsonBody(req: import("node:http").IncomingMessage): Promise<unknown> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) chunks.push(Buffer.from(chunk));
+  if (Buffer.concat(chunks).length > 64_000) throw new Error("Request body too large");
+  return JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
+}
+
 createServer(async (req, res) => {
   try {
     if (req.method === "POST" && req.url === "/api/hunt") {
       const started = await runHunt();
       return json(res, started ? 202 : 409, {
-        started,
-        running: Boolean(active),
-        lastStartedAt,
-        lastExitCode,
-        lastError,
-        intervalMinutes,
-        limit
+        started, running: Boolean(active), lastStartedAt, lastExitCode, lastError, intervalMinutes, limit
       });
     }
     if (req.method === "GET" && req.url === "/api/health") {
       return json(res, 200, { ok: true, running: Boolean(active), lastStartedAt, lastExitCode, lastError });
     }
+    if (req.method === "GET" && req.url === "/api/ledger") {
+      return json(res, 200, { entries: await readLedger() });
+    }
+    if (req.method === "POST" && req.url === "/api/ledger") {
+      const body = await readJsonBody(req) as Partial<BountyLedgerEntry>;
+      if (!body.id || !body.programId || !body.title || !body.status) {
+        return json(res, 400, { error: "id, programId, title and status are required" });
+      }
+      if (!["submitted", "accepted", "paid", "rejected"].includes(body.status)) {
+        return json(res, 400, { error: "invalid status" });
+      }
+      const entries = await upsertLedgerEntry({
+        id: String(body.id),
+        opportunityId: body.opportunityId ? String(body.opportunityId) : undefined,
+        programId: String(body.programId),
+        programName: body.programName ? String(body.programName) : undefined,
+        title: String(body.title),
+        status: body.status,
+        severity: body.severity ? String(body.severity) : undefined,
+        amount: body.amount == null || body.amount === "" ? undefined : Number(body.amount),
+        currency: body.currency ? String(body.currency) : undefined,
+        network: body.network ? String(body.network) : undefined,
+        walletAddress: body.walletAddress ? String(body.walletAddress) : undefined,
+        reportUrl: body.reportUrl ? String(body.reportUrl) : undefined,
+        payoutTxHash: body.payoutTxHash ? String(body.payoutTxHash) : undefined,
+        notes: body.notes ? String(body.notes) : undefined,
+        updatedAt: new Date().toISOString()
+      });
+      return json(res, 200, { saved: true, entries });
+    }
     if (req.url?.startsWith("/api/status")) {
       let hunt: unknown = null;
       try { hunt = JSON.parse(await readFile(artifact, "utf8")); } catch {}
-      return json(res, 200, { running: Boolean(active), lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt });
+      return json(res, 200, { running: Boolean(active), lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt, ledger: await readLedger() });
     }
     if (req.url?.startsWith("/api/hunt")) {
       let body: unknown = { programsDiscovered: 0, scannedRepositories: 0, candidateFindings: 0, skippedRepositories: 0, attemptedRepositories: 0, rateLimited: false, results: [] };
