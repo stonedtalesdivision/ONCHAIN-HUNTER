@@ -19,11 +19,14 @@ async function main(): Promise<void> {
   const candidates: unknown[] = [];
   let scannedRepositories = 0;
   let skippedRepositories = 0;
+  let attemptedRepositories = 0;
+  let rateLimited = false;
 
   outer:
   for (const program of programs.filter(p => p.status === "active")) {
     for (const repository of program.sourceRepos) {
-      if (scannedRepositories >= limit) break outer;
+      if (attemptedRepositories >= limit) break outer;
+      attemptedRepositories++;
       const constraint = inferVersionConstraint(program);
       const ref = requiredScanRef(constraint);
       if (!ref) {
@@ -61,6 +64,12 @@ async function main(): Promise<void> {
       } catch (error) {
         skippedRepositories++;
         const reason = error instanceof Error ? error.message : String(error);
+        if (reason.startsWith("GitHub API rate limit exhausted;")) {
+          rateLimited = true;
+          console.error(JSON.stringify({ event: "rate-limit", reason }));
+          break outer;
+        }
+        const reason = error instanceof Error ? error.message : String(error);
         candidates.push({ type: "scan-error", programId: program.id, repository, reason });
         console.error(JSON.stringify({ event: "scan-error", programId: program.id, repository, reason }));
       }
@@ -73,7 +82,9 @@ async function main(): Promise<void> {
     generatedAt: new Date().toISOString(),
     source: source.name,
     programsDiscovered: programs.length,
+    attemptedRepositories,
     scannedRepositories,
+    rateLimited,
     skippedRepositories,
     candidateFindings: candidates.filter((x: any) => !x.type).length,
     results: candidates
