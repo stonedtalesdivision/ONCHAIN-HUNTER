@@ -12,7 +12,13 @@ export type SecurityReport = {
     command: string;
     evidenceArtifact?: string;
   };
-  programChecks?: {\n    assetInScope: "unknown" | "yes" | "no";\n    pocRequired: boolean | "unknown";\n    automatedScannerOnly: boolean;\n    blockers: string[];\n  };\n  assessment: {
+  programChecks: {
+    assetInScope: "unknown" | "yes" | "no";
+    pocRequired: boolean | "unknown";
+    automatedScannerOnly: boolean;
+    blockers: string[];
+  };
+  assessment: {
     conclusion: "candidate-only" | "locally-reproduced" | "not-reproduced";
     confidence: number;
     impact: string;
@@ -23,12 +29,29 @@ export type SecurityReport = {
 
 export function buildSecurityReport(finding: Opportunity, validation: ValidationExecution): SecurityReport {
   const reproduced = validation.status === "passed";
+  const blockers: string[] = [];
+
+  if (finding.scopeMatch !== "yes") blockers.push("Repository/source revision scope has not been confirmed.");
+  if (validation.status !== "passed") blockers.push("No successful local validation evidence is attached.");
+  blockers.push("Program-specific asset, impact, known-issue and PoC requirements require human review.");
+
   return {
     schemaVersion: "1.0",
     generatedAt: new Date().toISOString(),
     finding,
-    validation: { status: validation.status, exitCode: validation.exitCode, command: validation.command, evidenceArtifact: validation.artifactPath },
-    programChecks: { assetInScope: "unknown", pocRequired: requirements?.pocRequired ?? "unknown", automatedScannerOnly: validation.status !== "passed", blockers },\n    assessment: {
+    validation: {
+      status: validation.status,
+      exitCode: validation.exitCode,
+      command: validation.command,
+      evidenceArtifact: validation.artifactPath
+    },
+    programChecks: {
+      assetInScope: finding.scopeMatch === "yes" ? "unknown" : "unknown",
+      pocRequired: "unknown",
+      automatedScannerOnly: validation.status !== "passed",
+      blockers
+    },
+    assessment: {
       conclusion: reproduced ? "locally-reproduced" : validation.status === "failed" ? "not-reproduced" : "candidate-only",
       confidence: finding.confidence,
       impact: "Impact must be demonstrated and tied to the specific bounty program's in-scope impact definitions before submission.",
