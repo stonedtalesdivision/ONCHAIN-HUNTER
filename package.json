@@ -13,7 +13,8 @@
     "scan:repo": "tsx src/jobs/scan-repository.ts",
     "validate:prepare": "tsx src/jobs/prepare-validation.ts",
     "harness:generate": "tsx src/jobs/generate-harness.ts",
-    "validate:run": "tsx src/jobs/run-validation.ts"
+    "validate:run": "tsx src/jobs/run-validation.ts",
+    "report:generate": "tsx src/jobs/generate-report.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.2",
