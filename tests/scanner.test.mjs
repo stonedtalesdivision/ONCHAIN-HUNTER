@@ -61,3 +61,20 @@ test("extracts contextual reachability and target-control evidence", () => {
   assert.ok(findings[0].evidence.some(x => x.includes("context.accessControl=true")));
   assert.ok(findings[0].evidence.some(x => x.includes("context.targetControl=user-influenced")));
 });
+
+test("filters intentional reverting delegatecall simulation wrappers", () => {
+  const source = [
+    "function simulateDelegatecall(address targetContract, bytes memory payload) public returns (bytes memory) {",
+    "  return this.simulateDelegatecallInternal(targetContract, payload);",
+    "}",
+    "function simulateDelegatecallInternal(address targetContract, bytes memory payload) external returns (bytes memory response) {",
+    "  (success, response) = targetContract.delegatecall(payload);",
+    "  revertWith(abi.encodePacked(response, success));",
+    "}",
+    "function revertWith(bytes memory response) internal pure {",
+    "  revert();",
+    "}"
+  ].join("\n");
+  const findings = scanSoliditySource(source, "StorageAccessible.sol");
+  assert.equal(findings.length, 0);
+});
