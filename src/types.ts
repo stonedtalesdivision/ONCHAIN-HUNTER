@@ -15,6 +15,6 @@ export interface BountyProgram {
 }
 export interface Opportunity {
   id: string; programId: string; title: string; category: string; severity: Severity;
-  confidence: number; evidence: string[]; status: "new" | "investigating" | "validated" | "dismissed"; createdAt: string;
+  confidence: number; evidence: string[]; status: "new" | "investigating" | "validated" | "dismissed"; createdAt: string; repository?: string; sourceRevision?: string; scopeMatch?: "yes" | "no" | "unknown";
 }
 export interface BountySource { name: string; discover(): Promise<BountyProgram[]>; }
