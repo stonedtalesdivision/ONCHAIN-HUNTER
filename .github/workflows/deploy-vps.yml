@@ -28,9 +28,7 @@ jobs:
             git reset --hard origin/main
             npm ci
             npm run build
-            if pm2 describe onchain-hunter >/dev/null 2>&1; then
-              pm2 restart onchain-hunter --update-env
-            else
-              pm2 start dist/autonomous.js --name onchain-hunter --update-env
-            fi
+            pm2 delete onchain-hunter >/dev/null 2>&1 || true
+            pm2 start ecosystem.config.cjs --only onchain-hunter --update-env
             pm2 save
+            pm2 startup systemd -u root --hp /root >/tmp/onchain-hunter-pm2-startup.txt 2>&1 || true
