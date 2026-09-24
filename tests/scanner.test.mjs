@@ -78,3 +78,28 @@ test("filters intentional reverting delegatecall simulation wrappers", () => {
   const findings = scanSoliditySource(source, "StorageAccessible.sol");
   assert.equal(findings.length, 0);
 });
+
+test("filters ordinary timestamp bookkeeping", () => {
+  const findings = scanSoliditySource(
+    'lastAddedAt[_account] = block.timestamp;',
+    "Vault.sol"
+  );
+  assert.equal(findings.length, 0);
+});
+
+test("filters ordinary timestamp interval accounting", () => {
+  const findings = scanSoliditySource(
+    'if (lastFundingTime + fundingInterval > block.timestamp) return;',
+    "Vault.sol"
+  );
+  assert.equal(findings.length, 0);
+});
+
+test("keeps timestamp in security-sensitive randomness context", () => {
+  const findings = scanSoliditySource(
+    'uint256 seed = uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender)));\n' +
+    'require(seed % 100 == 0);',
+    "Lottery.sol"
+  );
+  assert.equal(findings.length, 1);
+});
