@@ -5,6 +5,17 @@ type Candidate = {
   line: number; text: string; rationale: string;
 };
 
+export type ContextAssessment = {
+  functionName?: string;
+  modifiers: string[];
+  hasAccessControl: boolean;
+  targetExpressions: string[];
+  calldataExpressions: string[];
+  nearbyStateWrites: string[];
+  reachability: "unknown" | "externally-reachable" | "restricted";
+  targetControl: "unknown" | "user-influenced" | "constrained";
+};
+
 const PATTERNS = [
   { id: "tx-origin", title: "tx.origin used in authorization-sensitive code", category: "access-control", severity: "high" as Severity, base: 0.82, re: /\btx\.origin\b/ },
   { id: "selfdestruct", title: "selfdestruct usage", category: "destructive-operation", severity: "high" as Severity, base: 0.72, re: /\bselfdestruct\s*\(/ },
@@ -40,6 +51,30 @@ function isBenignSelfCall(line: string, lines: string[], i: number): boolean {
     && /\b(response|innerCall|calldata|success|ok)\b/.test(window);
 }
 
+function assessContext(lines: string[], i: number, ruleId: string): ContextAssessment {
+  const start = Math.max(0, i - 18);
+  const end = Math.min(lines.length, i + 18);
+  const windowLines = lines.slice(start, end);
+  const window = windowLines.join("\n");
+  const functionMatch = window.match(/function\s+([A-Za-z_][A-Za-z0-9_]*)\s*\([^)]*\)[^{]*(?:\{|$)/);
+  const modifiers = [...window.matchAll(/\b(only[A-Z][A-Za-z0-9_]*|onlyOwner|onlyAdmin|whenNotPaused|nonReentrant)\b/g)].map(m => m[1]);
+  const accessTerms = /\b(require|revert|assert)\s*\(|\b(only[A-Z][A-Za-z0-9_]*|onlyOwner|onlyAdmin)\b|\b(msg\.sender|hasRole|authorized|owner|admin)\b/.test(window);
+  const targetExpressions = [...new Set([...window.matchAll(/\b(?:targetContract|target|implementation|module|plugin)\b\s*(?:=|,|\))/g)].map(m => m[0].trim()))];
+  const calldataExpressions = [...new Set([...window.matchAll(/\b(?:calldataPayload|calldata|data|innerCall)\b/g)].map(m => m[0]))];
+  const nearbyStateWrites = windowLines.filter(line => /\b\w+\s*(?:\[[^\]]+\])?\s*=/.test(line) && !/\b(?:return|let|const|function)\b/.test(line)).map(line => line.trim()).slice(0, 8);
+  const externallyReachable = /\b(?:external|public)\b/.test(window);
+  return {
+    functionName: functionMatch?.[1],
+    modifiers: [...new Set(modifiers)],
+    hasAccessControl: accessTerms,
+    targetExpressions,
+    calldataExpressions,
+    nearbyStateWrites,
+    reachability: externallyReachable ? (modifiers.length || accessTerms ? "restricted" : "externally-reachable") : "unknown",
+    targetControl: /\b(?:msg\.sender|user|caller|targetContract)\b/.test(window) ? "user-influenced" : "unknown"
+  };
+}
+
 function contextScore(ruleId: string, lines: string[], i: number): number {
   const window = lines.slice(Math.max(0, i - 4), Math.min(lines.length, i + 5)).join("\n");
   let score = 0;
@@ -64,11 +99,21 @@ export function scanSoliditySource(source: string, file = "unknown.sol"): Opport
       if (rule.id === "low-level-call" && isBenignSelfCall(line, lines, i)) continue;
       const confidence = Math.max(0.05, Math.min(0.99, rule.base + contextScore(rule.id, lines, i)));
       const candidate: Candidate = { id: rule.id, title: rule.title, category: rule.category, severity: rule.severity, confidence, line: i + 1, text: line.trim(), rationale: "Static candidate requiring contextual review; confidence is heuristic." };
+      const assessment = assessContext(lines, i, rule.id);
       findings.push({
         id: `static:${candidate.id}:${file}:${candidate.line}`,
         programId: "unknown", title: candidate.title, category: candidate.category,
         severity: candidate.severity, confidence: candidate.confidence,
-        evidence: [`${file}:${candidate.line}: ${candidate.text}`, candidate.rationale],
+        evidence: [
+          `${file}:${candidate.line}: ${candidate.text}`,
+          candidate.rationale,
+          `context.function=${assessment.functionName ?? "unknown"}`,
+          `context.reachability=${assessment.reachability}`,
+          `context.accessControl=${assessment.hasAccessControl}`,
+          `context.targetControl=${assessment.targetControl}`,
+          ...(assessment.modifiers.length ? [`context.modifiers=${assessment.modifiers.join(",")}`] : []),
+          ...(assessment.nearbyStateWrites.length ? [`context.stateWrites=${assessment.nearbyStateWrites.join(" | ")}`] : [])
+        ],
         status: "new", createdAt: new Date().toISOString()
       });
     }
