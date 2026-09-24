@@ -43,7 +43,8 @@ function isBenignTimestampCheck(line: string, lines: string[], i: number): boole
   const deadlineGuard = /\b(require|revert|assert)\s*\(/.test(window)
     && /\b(validTo|validUntil|deadline|expiry|expiresAt|expiration)\b/i.test(window)
     && /[<>]=?/.test(window);
-  const bookkeeping = /\b(?:lastAddedAt|lastRemovedAt|lastUpdatedAt|lastCreatedAt|lastTimestamp|fundingTime|blockTimestampLast|(?:observation|observationsById)\b[^\n;]*)\s*=\s*[^;]*\bblock\.timestamp\b/i.test(window)
+  const bookkeeping = /\b(?:lastAddedAt|lastRemovedAt|lastUpdatedAt|lastCreatedAt|lastTimestamp|fundingTime|blockTimestampLast)\s*(?:\[[^\]]+\])?\s*=\s*[^;]*\bblock\.timestamp\b/i.test(window)
+    || /\b(?:observation|observationsById)\b[^;\n]*\bblock\.timestamp\b/i.test(window)
     || /\bblock\.timestamp\b[^;\n]*\.(?:initialize|update)\s*\(/i.test(window);
   const elapsedTime = /\b(?:cooldown|delay|duration|interval|maxTimeDelay|minTimeDelay|expiration|expiry|deadline|fundingInterval)\b/i.test(window)
     && /\bblock\.timestamp\b/.test(window)
