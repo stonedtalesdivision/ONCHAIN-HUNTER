@@ -39,10 +39,16 @@ function isLikelyNonProductionFile(file: string): boolean {
 }
 
 function isBenignTimestampCheck(line: string, lines: string[], i: number): boolean {
-  const window = lines.slice(Math.max(0, i - 2), Math.min(lines.length, i + 3)).join("\n");
-  return /\b(require|revert|assert)\s*\(/.test(window)
+  const window = lines.slice(Math.max(0, i - 3), Math.min(lines.length, i + 4)).join("\n");
+  const deadlineGuard = /\b(require|revert|assert)\s*\(/.test(window)
     && /\b(validTo|validUntil|deadline|expiry|expiresAt|expiration)\b/i.test(window)
     && /[<>]=?/.test(window);
+  const bookkeeping = /\b(?:last|block)?(?:AddedAt|RemovedAt|UpdatedAt|CreatedAt|Timestamp|timestamp|FundingTime|Observation|observationsById|blockTimestampLast)\b/i.test(window)
+    && /\b(?:=|\.initialize\s*\(|\.update\s*\()/.test(window);
+  const elapsedTime = /\b(?:\.sub\(|\.add\(|\+|-|>=|<=|>)\b/.test(window)
+    && /\b(?:block\.timestamp|timestamp)\b/.test(window)
+    && /\b(?:cooldown|delay|duration|interval|maxTimeDelay|minTimeDelay|expiration|expiry|deadline)\b/i.test(window);
+  return deadlineGuard || bookkeeping || elapsedTime;
 }
 
 function isBenignSelfCall(line: string, lines: string[], i: number): boolean {
