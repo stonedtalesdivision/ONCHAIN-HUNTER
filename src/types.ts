@@ -13,8 +13,15 @@ export interface BountyProgram {
   chains: string[]; inScope: string[]; sourceRepos: string[]; fetchedAt: string;
   requirements?: ProgramRequirement;
 }
+export type PayoutRoute = {
+  network: string;
+  asset?: string;
+  address?: string;
+  configured: boolean;
+  reason: string;
+};
 export interface Opportunity {
   id: string; programId: string; title: string; category: string; severity: Severity;
-  confidence: number; evidence: string[]; status: "new" | "investigating" | "validated" | "dismissed"; createdAt: string; repository?: string; sourceRevision?: string; scopeMatch?: "yes" | "no" | "unknown";
+  confidence: number; evidence: string[]; status: "new" | "investigating" | "validated" | "dismissed"; createdAt: string; repository?: string; sourceRevision?: string; scopeMatch?: "yes" | "no" | "unknown"; payoutRoutes?: PayoutRoute[];
 }
 export interface BountySource { name: string; discover(): Promise<BountyProgram[]>; }
