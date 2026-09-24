@@ -27,6 +27,19 @@ function isLikelyNonProductionFile(file: string): boolean {
     || /testinterface\.sol$/.test(base);
 }
 
+function isBenignTimestampCheck(line: string, lines: string[], i: number): boolean {
+  const window = lines.slice(Math.max(0, i - 2), Math.min(lines.length, i + 3)).join("\n");
+  return /\b(require|revert|assert)\s*\(/.test(window)
+    && /\b(validTo|validUntil|deadline|expiry|expiresAt|expiration)\b/i.test(window)
+    && /[<>]=?/.test(window);
+}
+
+function isBenignSelfCall(line: string, lines: string[], i: number): boolean {
+  const window = lines.slice(Math.max(0, i - 2), Math.min(lines.length, i + 3)).join("\n");
+  return /address\s*\(\s*this\s*\)\.call\s*\(/.test(line)
+    && /\b(response|innerCall|calldata|success|ok)\b/.test(window);
+}
+
 function contextScore(ruleId: string, lines: string[], i: number): number {
   const window = lines.slice(Math.max(0, i - 4), Math.min(lines.length, i + 5)).join("\n");
   let score = 0;
@@ -47,6 +60,8 @@ export function scanSoliditySource(source: string, file = "unknown.sol"): Opport
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       if (isComment(line) || !rule.re.test(line)) continue;
+      if (rule.id === "timestamp" && isBenignTimestampCheck(line, lines, i)) continue;
+      if (rule.id === "low-level-call" && isBenignSelfCall(line, lines, i)) continue;
       const confidence = Math.max(0.05, Math.min(0.99, rule.base + contextScore(rule.id, lines, i)));
       const candidate: Candidate = { id: rule.id, title: rule.title, category: rule.category, severity: rule.severity, confidence, line: i + 1, text: line.trim(), rationale: "Static candidate requiring contextual review; confidence is heuristic." };
       findings.push({
