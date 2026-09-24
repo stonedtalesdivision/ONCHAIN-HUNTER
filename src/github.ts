@@ -1,4 +1,3 @@
-import type { } from "./types.js";
 const API = "https://api.github.com";
 export type GitHubFile = { path: string; type: string; size?: number; download_url?: string };
 export async function listRepositoryFiles(repository: string, token?: string): Promise<GitHubFile[]> {
