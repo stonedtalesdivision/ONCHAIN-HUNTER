@@ -103,3 +103,43 @@ test("keeps timestamp in security-sensitive randomness context", () => {
   );
   assert.equal(findings.length, 1);
 });
+
+
+test("filters routine timestamp reads without security-sensitive context", () => {
+  const findings = scanSoliditySource(
+    'uint256 nowValue = block.timestamp;',
+    "Vault.sol"
+  );
+  assert.equal(findings.length, 0);
+});
+
+test("keeps timestamp when used as a randomness input", () => {
+  const findings = scanSoliditySource(
+    'uint256 seed = uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender)));',
+    "Lottery.sol"
+  );
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].category, "time-dependence");
+});
+
+test("raises delegatecall confidence for user-controlled target and calldata", () => {
+  const findings = scanSoliditySource(
+    'function execute(address targetContract, bytes calldata data) external {\n' +
+    '  targetContract.delegatecall(data);\n' +
+    '}',
+    "Proxy.sol"
+  );
+  assert.equal(findings.length, 1);
+  assert.ok(findings[0].confidence > 0.70);
+});
+
+test("raises low-level call confidence when value is forwarded to a user-controlled destination", () => {
+  const findings = scanSoliditySource(
+    'function send(address recipient, uint256 amount) external {\n' +
+    '  recipient.call{value: amount}("");\n' +
+    '}',
+    "Payments.sol"
+  );
+  assert.equal(findings.length, 1);
+  assert.ok(findings[0].confidence > 0.55);
+});
