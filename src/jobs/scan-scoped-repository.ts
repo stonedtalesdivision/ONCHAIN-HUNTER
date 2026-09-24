@@ -53,7 +53,7 @@ if (!effectiveRef) {
 
 const token = process.env.GITHUB_TOKEN;
 const revision = await resolveRepositoryRevision(repository, effectiveRef, token);
-const scopeMatch = isRepositoryRefEligible(revision.commitSha, constraint);
+const scopeMatch = isRepositoryRefEligible(effectiveRef, constraint);
 if (scopeMatch === false) {
   console.error(JSON.stringify({
     error: "Resolved revision does not satisfy the parsed program scope",
