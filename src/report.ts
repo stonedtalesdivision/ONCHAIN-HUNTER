@@ -12,7 +12,7 @@ export type SecurityReport = {
     command: string;
     evidenceArtifact?: string;
   };
-  assessment: {
+  programChecks?: {\n    assetInScope: "unknown" | "yes" | "no";\n    pocRequired: boolean | "unknown";\n    automatedScannerOnly: boolean;\n    blockers: string[];\n  };\n  assessment: {
     conclusion: "candidate-only" | "locally-reproduced" | "not-reproduced";
     confidence: number;
     impact: string;
@@ -28,7 +28,7 @@ export function buildSecurityReport(finding: Opportunity, validation: Validation
     generatedAt: new Date().toISOString(),
     finding,
     validation: { status: validation.status, exitCode: validation.exitCode, command: validation.command, evidenceArtifact: validation.artifactPath },
-    assessment: {
+    programChecks: { assetInScope: "unknown", pocRequired: requirements?.pocRequired ?? "unknown", automatedScannerOnly: validation.status !== "passed", blockers },\n    assessment: {
       conclusion: reproduced ? "locally-reproduced" : validation.status === "failed" ? "not-reproduced" : "candidate-only",
       confidence: finding.confidence,
       impact: "Impact must be demonstrated and tied to the specific bounty program's in-scope impact definitions before submission.",
