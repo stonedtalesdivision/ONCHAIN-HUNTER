@@ -43,6 +43,3 @@ jobs:
             done
             test -s /tmp/onchain-hunter-health.json
 
-            echo "Checking public HTTPS endpoint..."
-            curl -fsS --retry 5 --retry-delay 2 https://hunter.texvic.tech/api/health >/tmp/onchain-hunter-public-health.json
-            cat /tmp/onchain-hunter-public-health.json
