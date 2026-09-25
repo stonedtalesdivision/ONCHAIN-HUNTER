@@ -9,7 +9,8 @@ import { prioritizeScanTargets } from "../target-prioritizer.js";
 import { analyzeSolidityStructure, structuralFindings } from "../structural-analysis.js";
 import { detectBrokenAccessControl } from "../detectors/access-control.js";
 import { detectPhase3 } from "../detectors/phase3.js";
-import { buildEvidenceGraph, type EvidenceGraph } from "../evidence-graph.js";
+import { buildCorrelatedEvidenceGraphs, deduplicateFindings, type EvidenceGraph } from "../evidence-graph.js";
+import type { Opportunity } from "../types.js";
 
 async function main(): Promise<void> {
   const hasToken = Boolean(process.env.GITHUB_TOKEN);
@@ -69,21 +70,20 @@ async function main(): Promise<void> {
           structuralFiles.push(structure);
           structuralSummaries.push(structure);
 
-          for (const finding of [...scanSoliditySource(sourceText, file.path), ...structuralFindings(structure), ...detectBrokenAccessControl(structure), ...detectPhase3(structure)]) {
-            repoFindings++;
-            const matchedFunction = structure.functions.find(fn => finding.evidence.some(e => e.includes(`function ${fn.name} `)) || finding.title.includes(fn.name));
-            if (matchedFunction) evidenceGraphs.push(buildEvidenceGraph(structure, matchedFunction, finding));
-            candidates.push({
-              ...finding,
-              id: `${program.id}:${repository}:${revision.commitSha}:${finding.id}`,
-              programId: program.id,
-              repository,
-              sourceRevision: revision.commitSha,
-              scopeMatch: "yes",
-              payoutRoutes: payoutRoutesForProgram(program),
-              evidence: [`program: ${program.id}`, `repository: ${repository}`, `revision: ${revision.commitSha}`, ...finding.evidence]
-            });
-          }
+          const detectorFindings = [...scanSoliditySource(sourceText, file.path), ...structuralFindings(structure), ...detectBrokenAccessControl(structure), ...detectPhase3(structure)].map(finding => ({
+            ...finding,
+            id: `${program.id}:${repository}:${revision.commitSha}:${finding.id}`,
+            programId: program.id,
+            repository,
+            sourceRevision: revision.commitSha,
+            scopeMatch: "yes" as const,
+            payoutRoutes: payoutRoutesForProgram(program),
+            evidence: [`program: ${program.id}`, `repository: ${repository}`, `revision: ${revision.commitSha}`, ...finding.evidence]
+          })) as Opportunity[];
+          const uniqueFindings = deduplicateFindings(detectorFindings);
+          repoFindings += uniqueFindings.length;
+          evidenceGraphs.push(...buildCorrelatedEvidenceGraphs(structure, uniqueFindings));
+          candidates.push(...uniqueFindings);
         }
 
         scannedRepositories++;
