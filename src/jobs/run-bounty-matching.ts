@@ -1,0 +1,11 @@
+import "dotenv/config";
+import {readFile,writeFile,mkdir} from "node:fs/promises";
+import {ImmunefiBountySource} from "../sources/immunefi.js";
+import {matchEvidencePackage,rankBountyMatches} from "../bounty-matcher.js";
+import {payoutRoutesForProgram} from "../payout.js";
+const hunt=JSON.parse(await readFile(process.argv[2]??"artifacts/hunt/latest.json","utf8"));
+const programs=await new ImmunefiBountySource().discover();
+const packages=hunt.evidencePackages??[];
+const matches=packages.map((p:any)=>({packageId:p.packageId,findingId:p.findingId,matches:rankBountyMatches(matchEvidencePackage(p,programs,payoutRoutesForProgram))}));
+const output={schemaVersion:"phase-6",generatedAt:new Date().toISOString(),source:"immunefi",totalPackages:packages.length,matchedPackages:matches.filter((x:any)=>x.matches.length).length,matches};
+await mkdir("artifacts/hunt",{recursive:true});await writeFile("artifacts/hunt/bounty-matches.json",JSON.stringify(output,null,2),"utf8");console.log(JSON.stringify(output,null,2));
