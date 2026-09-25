@@ -136,7 +136,9 @@ createServer(async (req, res) => {
       let hunt: unknown = null;
       try { hunt = JSON.parse(await readFile(artifact, "utf8")); } catch {}
       let monitoring: unknown = { schemaVersion: "phase-8", generatedAt: null, events: [] };
+      let orchestration: unknown = { schemaVersion: "phase-10", executionEnabled: false, queue: [] };
       try { monitoring = JSON.parse(await readFile(monitoringArtifact, "utf8")); } catch {}
+      try { orchestration = JSON.parse(await readFile(orchestrationArtifact, "utf8")); } catch {}
       return json(res, 200, { running: Boolean(active), lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt, monitoring, orchestration, ledger: await readLedger() });
     }
     if (req.url?.startsWith("/api/hunt")) {
