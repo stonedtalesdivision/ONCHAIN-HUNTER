@@ -25,7 +25,8 @@
     "report:hunt": "tsx src/jobs/generate-hunt-reports.ts",
     "investigate:orchestrate": "tsx src/investigation-orchestrator.ts",
     "proof:generate": "tsx src/proof-engine.ts",
-    "validation:prepare": "tsx src/validation-orchestrator.ts"
+    "validation:prepare": "tsx src/validation-orchestrator.ts",
+    "bounty:intelligence": "tsx src/bounty-intelligence.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.2",
