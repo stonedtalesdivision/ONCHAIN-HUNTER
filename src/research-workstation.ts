@@ -59,7 +59,7 @@ export function buildResearchWorkstation(
   validationBundles: ValidationBundle[],
   intelligence: BountyIntel[]
 ): ResearchWorkstation {
-  const items = packages.map(pkg => {
+  const items: WorkstationItem[] = packages.map(pkg => {
     const inv = investigationFor(pkg, investigations);
     const proof = proofs.find(p => p.packageId === pkg.packageId);
     const validation = validationBundles.find(v => v.packageId === pkg.packageId);
