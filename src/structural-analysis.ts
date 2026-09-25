@@ -63,10 +63,9 @@ export function analyzeSolidityStructure(source:string,file="unknown.sol"):Struc
     const stateWrites:string[]=Array.from(new Set(Array.from(body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)(?:\s*\[[^\]]+\])?\s*(?:\+=|-=|\*=|\/=|%=|=)/g),m=>m[1]))).filter((name:string)=>stateVariables.includes(name));
     const externalCalls:string[]=Array.from(new Set(Array.from(body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)\.(?:call|callcode|staticcall)\s*(?:\{|\()/g),m=>m[1])));
     const delegateCalls:string[]=Array.from(new Set(Array.from(body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)\.delegatecall\s*\(/g),m=>m[1])));
-    const valueTransfers:string[]=Array.from(new Set([
-      ...Array.from(body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)\.call\s*\{\s*value\s*:/g),m=>m[1]),
-      ...Array.from(body.matchAll(/\b(?:transfer|send)\s*\(/g,()=> "native-transfer"))
-    ]));
+    const valueCallTargets:string[] = Array.from(body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)\.call\s*\{\s*value\s*:/g)).map(m=>m[1]);
+    const nativeTransfers:string[] = Array.from(body.matchAll(/\b(?:transfer|send)\s*\(/g)).map(() => "native-transfer");
+    const valueTransfers:string[] = Array.from(new Set([...valueCallTargets,...nativeTransfers]));
     const tokenTransfers:string[]=Array.from(new Set(Array.from(body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)\.(transfer|transferFrom|safeTransfer|safeTransferFrom|approve|safeApprove)\s*\(/g),m=>`${m[1]}.${m[2]}`)));
     const signatureOperations:string[]=Array.from(new Set(Array.from(body.matchAll(/\b(?:ecrecover|ECDSA\.(?:recover|toEthSignedMessageHash)|SignatureChecker\.|permit\s*\()/g),m=>m[0].replace(/\s+/g,""))));
     const nonceWrites:string[]=Array.from(new Set(Array.from(body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*nonce[A-Za-z0-9_]*)\s*(?:\+\+|--|\+=|=)/gi),m=>m[1])));
