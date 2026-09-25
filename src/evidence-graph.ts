@@ -20,6 +20,10 @@ export type EvidenceGraph = {
   reviewQuestions: string[];
   correlationKey: string;
   corroborationCount: number;
+  impact: "asset-loss" | "privilege-escalation" | "state-corruption" | "oracle-manipulation" | "external-execution" | "unknown";
+  exploitability: "direct" | "conditional" | "uncertain";
+  scopeConfidence: "exact-revision" | "repository" | "unknown";
+  deduplicationKey: string;
 };
 
 function node(id: string, kind: EvidenceNode["kind"], label: string, evidence: string[] = []): EvidenceNode {
@@ -78,6 +82,9 @@ function graphForFunction(analysis: StructuralFileAnalysis, fn: StructuralFuncti
   const operationIds = nodes.filter(n => n.kind === "operation" || n.kind === "asset" || n.kind === "state").map(n => n.id);
   for (const id of operationIds) edge(auth, id, "authorization-gates", [fn.accessControlled ? "authorization detected" : "authorization not detected"]);
 
+  const impact = fn.valueTransfers.length || fn.tokenTransfers.length ? "asset-loss" : fn.delegateCalls.length || fn.upgradeOperations.length ? "privilege-escalation" : fn.oracleReads.length ? "oracle-manipulation" : fn.stateWrites.length ? "state-corruption" : fn.externalCalls.length ? "external-execution" : "unknown";
+  const exploitability = fn.userControlledInputs.length && !fn.accessControlled ? "direct" : fn.userControlledInputs.length ? "conditional" : "uncertain";
+  const scopeConfidence = primary.sourceRevision ? "exact-revision" : primary.repository ? "repository" : "unknown";
   const attackPath = [
     ...fn.userControlledInputs.map(x => `attacker-controlled input: ${x}`),
     `reachable function: ${fn.name}`,
@@ -106,7 +113,11 @@ function graphForFunction(analysis: StructuralFileAnalysis, fn: StructuralFuncti
       "Can the suspected impact be reproduced in an isolated local test?"
     ],
     correlationKey: `${analysis.file}:${fn.name}:${fn.startLine}`,
-    corroborationCount: findings.length
+    corroborationCount: findings.length,
+    impact,
+    exploitability,
+    scopeConfidence,
+    deduplicationKey: `${primary.repository ?? ""}:${primary.sourceRevision ?? ""}:${analysis.file}:${fn.name}:${fn.startLine}`
   };
 }
 
@@ -158,4 +169,28 @@ export function deduplicateFindings(findings: Opportunity[]): Opportunity[] {
 export function buildAttackChains(analysis: StructuralFileAnalysis, findings: Opportunity[]): EvidenceGraph[] {
   const relevant = findings.filter(f => f.repository || f.sourceRevision);
   return buildCorrelatedEvidenceGraphs(analysis, relevant);
+}
+
+export function rankEvidenceGraphs(graphs: EvidenceGraph[]): EvidenceGraph[] {
+  return [...graphs].sort((a, b) => {
+    const severity = (x: Severity) => ({ critical: 5, high: 4, medium: 3, low: 2, informational: 1 }[x]);
+    const impact = (x: EvidenceGraph["impact"]) => x === "asset-loss" || x === "privilege-escalation" ? 3 : x === "state-corruption" || x === "oracle-manipulation" ? 2 : 1;
+    return (severity(b.severity) * 10 + impact(b.impact) + b.corroborationCount) - (severity(a.severity) * 10 + impact(a.impact) + a.corroborationCount);
+  });
+}
+
+export function mergeEvidenceGraphs(graphs: EvidenceGraph[]): EvidenceGraph[] {
+  const merged = new Map<string, EvidenceGraph>();
+  for (const graph of graphs) {
+    const existing = merged.get(graph.deduplicationKey);
+    if (!existing) { merged.set(graph.deduplicationKey, graph); continue; }
+    existing.nodes = [...existing.nodes, ...graph.nodes].filter((n, i, a) => a.findIndex(x => x.id === n.id) === i);
+    existing.edges = [...existing.edges, ...graph.edges].filter((e, i, a) => a.findIndex(x => x.from === e.from && x.to === e.to && x.relation === e.relation) === i);
+    existing.attackPath = [...new Set([...existing.attackPath, ...graph.attackPath])];
+    existing.reviewQuestions = [...new Set([...existing.reviewQuestions, ...graph.reviewQuestions])];
+    existing.categories = [...new Set([...existing.categories, ...graph.categories])];
+    existing.corroborationCount += graph.corroborationCount;
+    existing.confidence = Math.min(0.99, Math.max(existing.confidence, graph.confidence) + 0.02);
+  }
+  return [...merged.values()];
 }
