@@ -23,6 +23,7 @@ let lastStartedAt: string | null = null;
 let lastExitCode: number | null = null;
 let lastError: string | null = null;
 let retryTimer: NodeJS.Timeout | null = null;
+const maxHuntRuntimeMinutes = Math.max(5, Number(process.env.HUNT_MAX_RUNTIME_MINUTES ?? 45));
 
 async function runHunt(): Promise<boolean> {
   if (active) return false;
@@ -34,6 +35,14 @@ async function runHunt(): Promise<boolean> {
     env: { ...process.env, ONCHAIN_HUNTER_LIMIT: String(limit) },
     stdio: ["ignore", "pipe", "pipe"]
   });
+  const huntTimeout = setTimeout(() => {
+    if (active) {
+      lastError = "Hunt exceeded maximum runtime of " + maxHuntRuntimeMinutes + " minutes";
+      console.error(JSON.stringify({ event: "hunt-timeout", maxHuntRuntimeMinutes }));
+      active.kill("SIGTERM");
+      setTimeout(() => { if (active) active.kill("SIGKILL"); }, 10_000);
+    }
+  }, maxHuntRuntimeMinutes * 60_000);
   active.on("error", error => {
     lastError = error instanceof Error ? error.message : String(error);
     console.error(JSON.stringify({ event: "hunt-spawn-error", error: lastError }));
@@ -42,6 +51,7 @@ async function runHunt(): Promise<boolean> {
   active.stdout?.on("data", d => process.stdout.write(d));
   active.stderr?.on("data", d => process.stderr.write(d));
   active.on("close", code => {
+    clearTimeout(huntTimeout);
     lastExitCode = code;
     if (code !== 0) lastError = "Hunt exited with code " + code;
     if (code === 0) {
