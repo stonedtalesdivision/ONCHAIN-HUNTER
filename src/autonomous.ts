@@ -4,6 +4,7 @@ import { readFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { spawn, type ChildProcess } from "node:child_process";
 import { readLedger, upsertLedgerEntry, type BountyLedgerEntry } from "./ledger.js";
+import { buildProductionReadiness } from "./production-readiness.js";
 
 const port = Number(process.env.PORT ?? process.env.DASHBOARD_PORT ?? 4173);
 const intervalMinutes = Math.max(15, Number(process.env.HUNT_INTERVAL_MINUTES ?? 60));
@@ -94,6 +95,9 @@ createServer(async (req, res) => {
       try { monitoring = JSON.parse(await readFile(monitoringArtifact, "utf8")); } catch {}
       return json(res, 200, monitoring);
     }
+    if (req.method === "GET" && req.url === "/api/production-readiness") {
+      return json(res, 200, await buildProductionReadiness(root));
+    }
     if (req.method === "GET" && req.url === "/api/research-workstation") {
       let workstation: unknown = { schemaVersion: "phase-14", humanReviewOnly: true, submissionEnabled: false, summary: { total: 0, blocked: 0, readyForReview: 0 }, items: [], reviewQueue: [] };
       try { workstation = JSON.parse(await readFile(workstationArtifact, "utf8")); } catch {}
@@ -162,7 +166,7 @@ createServer(async (req, res) => {
       try { monitoring = JSON.parse(await readFile(monitoringArtifact, "utf8")); } catch {}
       try { orchestration = JSON.parse(await readFile(orchestrationArtifact, "utf8")); } catch {}
       try { workstation = JSON.parse(await readFile(workstationArtifact, "utf8")); } catch {}
-      return json(res, 200, { running: Boolean(active), lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt, monitoring, orchestration, workstation, ledger: await readLedger() });
+      return json(res, 200, { running: Boolean(active), lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt, monitoring, orchestration, workstation, productionReadiness: await buildProductionReadiness(root), ledger: await readLedger() });
     }
     if (req.url?.startsWith("/api/hunt")) {
       let body: unknown = { programsDiscovered: 0, scannedRepositories: 0, candidateFindings: 0, skippedRepositories: 0, attemptedRepositories: 0, rateLimited: false, results: [] };
