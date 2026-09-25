@@ -122,7 +122,9 @@ createServer(async (req, res) => {
     if (req.url?.startsWith("/api/status")) {
       let hunt: unknown = null;
       try { hunt = JSON.parse(await readFile(artifact, "utf8")); } catch {}
-      let monitoring: unknown = { schemaVersion: "phase-8", generatedAt: null, events: [] };\n      try { monitoring = JSON.parse(await readFile(monitoringArtifact, "utf8")); } catch {}\n      return json(res, 200, { running: Boolean(active), lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt, monitoring, ledger: await readLedger() });
+      let monitoring: unknown = { schemaVersion: "phase-8", generatedAt: null, events: [] };
+      try { monitoring = JSON.parse(await readFile(monitoringArtifact, "utf8")); } catch {}
+      return json(res, 200, { running: Boolean(active), lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt, monitoring, ledger: await readLedger() });
     }
     if (req.url?.startsWith("/api/hunt")) {
       let body: unknown = { programsDiscovered: 0, scannedRepositories: 0, candidateFindings: 0, skippedRepositories: 0, attemptedRepositories: 0, rateLimited: false, results: [] };
