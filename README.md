@@ -67,3 +67,13 @@ bash scripts/secure-dashboard.sh hunter.texvic.tech
 ```
 
 After authentication is enabled, both the dashboard and its API endpoints are protected by the same Nginx gate.
+
+## Phase 6 — Bounty Matching
+
+Phase 6 matches evidence packages against active bounty-program catalog records. It requires explicit repository scope for a match; unlisted repositories are not treated as eligible. Matches include impact/severity signals, payout routes, PoC/KYC requirements when the source exposes them, prohibited activities, known-issue notes, and a human-review status.
+
+- `npm run bounty:match` writes `artifacts/hunt/bounty-matches.json`.
+- Hunt artifacts now include `bountyMatches` and `bountyMatchSummary`.
+- Exact repository scope is distinguished from catalog uncertainty.
+- Payout routing is surfaced but never submitted automatically.
+- Program-page scope, impact, known issues, PoC requirements and disclosure rules still require human review before submission.
