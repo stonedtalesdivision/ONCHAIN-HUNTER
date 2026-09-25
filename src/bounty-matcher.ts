@@ -29,4 +29,16 @@ export function matchEvidencePackage(pkg:EvidencePackage,programs:BountyProgram[
  }).filter(m=>m.scope==="exact-repository"||m.impact==="matched");
 }
 
-export function rankBountyMatches(matches:BountyMatch[]):BountyMatch[]{return [...matches].sort((a,b)=>(a.scope==="exact-repository"?2:0)+(a.impact==="matched"?1:0)+(a.severity==="matched"?1:0)-(b.scope==="exact-repository"?2:0)-(b.impact==="matched"?1:0)-(b.severity==="matched"?1:0))}
+export function rankBountyMatches(matches:BountyMatch[]):BountyMatch[]{
+ return [...matches].sort((a,b)=>{
+  const scopeA=a.scope==="exact-repository"?2:a.scope==="repository-not-listed"?1:0;
+  const scopeB=b.scope==="exact-repository"?2:b.scope==="repository-not-listed"?1:0;
+  if(scopeA!==scopeB)return scopeB-scopeA;
+  const impactA=a.impact==="matched"?1:0;
+  const impactB=b.impact==="matched"?1:0;
+  if(impactA!==impactB)return impactB-impactA;
+  const severityA=a.severity==="matched"?1:0;
+  const severityB=b.severity==="matched"?1:0;
+  return severityB-severityA;
+ });
+}
