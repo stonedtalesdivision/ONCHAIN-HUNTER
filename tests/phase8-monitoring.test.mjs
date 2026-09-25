@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdir, rm, readFile } from "node:fs/promises";
-import { updateMonitoringState } from "../dist/monitoring.js";
+import { updateMonitoringState, prioritizeChangedTargets } from "../dist/monitoring.js";
 
 test("phase 8 detects added and changed monitoring records", async () => {
   await rm("artifacts/monitoring", { recursive: true, force: true });
@@ -24,4 +24,13 @@ test("phase 8 detects added and changed monitoring records", async () => {
 
   const saved = JSON.parse(await readFile("artifacts/monitoring/latest-events.json", "utf8"));
   assert.equal(saved.schemaVersion, "phase-8");
+
+  const ranked = prioritizeChangedTargets(
+    [
+      { programId: "p1", repository: "org/repo", ref: "main", score: 10 },
+      { programId: "p2", repository: "org/new", ref: "main", score: 1 }
+    ],
+    first.current
+  );
+  assert.equal(ranked[0].repository, "org/new");
 });
