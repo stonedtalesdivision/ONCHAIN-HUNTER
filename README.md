@@ -77,3 +77,12 @@ Phase 6 matches evidence packages against active bounty-program catalog records.
 - Exact repository scope is distinguished from catalog uncertainty.
 - Payout routing is surfaced but never submitted automatically.
 - Program-page scope, impact, known issues, PoC requirements and disclosure rules still require human review before submission.
+
+## Phase 7 — Human-review disclosure reports
+
+Phase 7 turns exact-scope bounty matches and evidence packages into structured security reports for human review. It does not submit reports or transactions automatically.
+
+- `npm run report:hunt` reads `artifacts/hunt/latest.json` and writes JSON + Markdown reports under `artifacts/reports/`.
+- `artifacts/hunt/review-queue.json` records every generated report, validation state, blockers and submission status.
+- Reports include attack path, transaction sequence, evidence, source revision, bounty scope, payout routes and PoC/KYC requirements when available.
+- Submission is permanently marked `false` in Phase 7; program-page review and responsible disclosure remain human-controlled.
