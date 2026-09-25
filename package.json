@@ -23,7 +23,9 @@
     "validate:suite": "tsx src/jobs/prepare-validation-suite.ts",
     "bounty:match": "tsx src/jobs/run-bounty-matching.ts",
     "report:hunt": "tsx src/jobs/generate-hunt-reports.ts",
-    "investigate:orchestrate": "tsx src/investigation-orchestrator.ts"
+    "investigate:orchestrate": "tsx src/investigation-orchestrator.ts",
+    "proof:generate": "tsx src/proof-engine.ts",
+    "validation:prepare": "tsx src/validation-orchestrator.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.2",
