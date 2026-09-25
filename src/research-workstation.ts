@@ -20,7 +20,7 @@ export type WorkstationItem = {
   bountyProgramName?: string;
   intelligenceScore?: number;
   proofScore?: number;
-  validationStatus: ValidationBundle["status"] | "missing";
+  validationStatus: "prepared" | "missing";
   investigationStatus: "queued" | "blocked" | "review";
   blockers: string[];
   nextActions: string[];
