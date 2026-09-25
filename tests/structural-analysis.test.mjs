@@ -10,7 +10,7 @@ test("extracts function structure, state writes, calls and access control", () =
     "  function deposit(uint256 amount) external payable { total += amount; }",
     "  function adminWithdraw(address recipient, uint256 amount) external onlyOwner {",
     "    total -= amount;",
-    "    recipient.call{value: amount}(\\\"\\\");",
+    '    recipient.call{value: amount}("");',
     "  }",
     "}"
   ].join("\n");
