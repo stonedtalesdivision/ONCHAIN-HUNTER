@@ -27,7 +27,8 @@
     "proof:generate": "tsx src/proof-engine.ts",
     "validation:prepare": "tsx src/validation-orchestrator.ts",
     "bounty:intelligence": "tsx src/bounty-intelligence.ts",
-    "research:workstation": "tsx src/research-workstation.ts"
+    "research:workstation": "tsx src/research-workstation.ts",
+    "production:readiness": "tsx src/production-readiness.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.2",
