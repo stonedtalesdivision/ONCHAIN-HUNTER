@@ -20,6 +20,7 @@ async function main(): Promise<void> {
   console.log(JSON.stringify({ event: "catalog-loaded", programsDiscovered: programs.length }));
 
   const candidates: unknown[] = [];
+  const structuralSummaries: unknown[] = [];
   const payoutConfiguration = programs.filter(p => p.status === "active").map(program => ({
     programId: program.id,
     programName: program.name,
@@ -62,6 +63,7 @@ async function main(): Promise<void> {
           const sourceText = await fetchRawFile(file.download_url, token);
           const structure = analyzeSolidityStructure(sourceText, file.path);
           structuralFiles.push(structure);
+          structuralSummaries.push(structure);
 
           for (const finding of [...scanSoliditySource(sourceText, file.path), ...structuralFindings(structure)]) {
             repoFindings++;
@@ -114,7 +116,7 @@ async function main(): Promise<void> {
     })),
     candidateFindings: candidates.filter((x: any) => !x.type).length,
     payoutConfiguration,
-    structuralAnalysis: candidates.length ? "Function/state/call structure is collected for every scanned Solidity/Vyper source file; structural findings remain review candidates until validated." : "No scanned structural data.",
+    structuralAnalysis: structuralSummaries,
     results: candidates
   };
   await writeFile(path, JSON.stringify(result, null, 2), "utf8");
