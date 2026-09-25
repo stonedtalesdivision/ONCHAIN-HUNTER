@@ -4,6 +4,7 @@ import type { InvestigationOrchestration } from "./investigation-orchestrator.js
 import type { ProofDossier } from "./proof-engine.js";
 import type { ValidationBundle } from "./validation-orchestrator.js";
 import type { BountyIntel } from "./bounty-intelligence.js";
+import { readFile, writeFile } from "node:fs/promises";
 
 export type WorkstationItem = {
   id: string;
@@ -122,3 +123,20 @@ export function buildResearchWorkstation(
     ]
   };
 }
+
+
+async function main(): Promise<void> {
+  const read = async <T>(path: string, fallback: T): Promise<T> => { try { return JSON.parse(await readFile(path, "utf8")) as T; } catch { return fallback; } };
+  const hunt = await read<Record<string, unknown>>("artifacts/hunt/latest.json", {});
+  const packages = (hunt.evidencePackages ?? []) as EvidencePackage[];
+  const investigations = await read<InvestigationState>("artifacts/investigations/state.json", { schemaVersion: "phase-9", updatedAt: new Date().toISOString(), records: {} });
+  const orchestration = await read<InvestigationOrchestration>("artifacts/investigations/orchestration.json", { schemaVersion: "phase-10", generatedAt: new Date().toISOString(), executionEnabled: false, queue: [] });
+  const proofs = await Promise.all(packages.map(async p => read<ProofDossier>("artifacts/validation-bundles/" + p.packageId + ".proof.json", { schemaVersion: "phase-11", packageId: p.packageId, findingId: p.findingId, fingerprint: "", claims: [], attackPath: [], transactionSequence: [], gaps: ["missing artifact"], proofScore: 0, humanReviewRequired: true })));
+  const bundles = await Promise.all(packages.map(async p => read<ValidationBundle>("artifacts/validation-bundles/" + p.packageId + ".json", { schemaVersion: "phase-12", packageId: p.packageId, findingId: p.findingId, harnessPath: "", proofPath: "", commands: [], status: "prepared", executionEnabled: false, safety: { localOnly: true, liveNetworkTraffic: false, explicitExecutionRequired: true } })));
+  const intel = await read<{ items: BountyIntel[] }>("artifacts/hunt/bounty-intelligence.json", { items: [] });
+  const workstation = buildResearchWorkstation(packages, investigations, orchestration, proofs, bundles, intel.items ?? []);
+  await writeFile("artifacts/hunt/research-workstation.json", JSON.stringify(workstation, null, 2), "utf8");
+  console.log(JSON.stringify(workstation, null, 2));
+}
+
+if (process.argv[1]?.endsWith("research-workstation.ts")) main().catch(error => { console.error(error); process.exitCode = 1; });
