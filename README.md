@@ -86,3 +86,15 @@ Phase 7 turns exact-scope bounty matches and evidence packages into structured s
 - `artifacts/hunt/review-queue.json` records every generated report, validation state, blockers and submission status.
 - Reports include attack path, transaction sequence, evidence, source revision, bounty scope, payout routes and PoC/KYC requirements when available.
 - Submission is permanently marked `false` in Phase 7; program-page review and responsible disclosure remain human-controlled.
+
+
+## Phase 8 — Continuous Monitoring
+
+Phase 8 adds persistent change detection to the autonomous hunt cycle. Each successful hunt records a monitoring snapshot for active bounty programs, prioritized repositories and evidence findings, then compares it with the previous snapshot.
+
+- `artifacts/monitoring/state.json` stores the latest monitoring state.
+- `artifacts/monitoring/latest-events.json` records newly detected program, target and finding changes.
+- `GET /api/monitoring` exposes the latest monitoring events.
+- `GET /api/status` now includes monitoring data.
+- Changed repository refs and finding revisions are surfaced for follow-up scanning/review.
+- Monitoring is detection-only: it does not exploit live systems or submit bounty reports automatically.
