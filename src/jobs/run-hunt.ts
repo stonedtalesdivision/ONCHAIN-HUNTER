@@ -31,9 +31,31 @@ async function main(): Promise<void> {
  console.log(JSON.stringify({event:"targets-prioritized",monitoringBaseline:Boolean(previousMonitoring),activePrograms:activePrograms.length,repositoriesAvailable:allRepositoryCount,exactScopeTargets:targets.length,scopeReviewRequired,selected:selectedTargets.map(t=>({programId:t.program.id,repository:t.repository,ref:t.ref,score:t.score}))}));
  for(const target of selectedTargets){const {program,repository,ref}=target;attemptedRepositories++;console.log(JSON.stringify({event:"scan-start",programId:program.id,repository,ref,priorityScore:target.score,priorityReasons:target.reasons}));
   try{const revision=await resolveRepositoryRevision(repository,ref,token),files=await listRepositoryFiles(repository,token,ref),solidity=files.filter(f=>/\.sol$/i.test(f.path));let repoFindings=0;
-   for(const file of solidity){if(!file.download_url)continue;const sourceText=await fetchRawFile(file.download_url,token),structure=analyzeSolidityStructure(sourceText,file.path);structuralSummaries.push(structure);
+   const concurrency=Math.max(1,Math.min(Number(process.env.ONCHAIN_HUNTER_FILE_CONCURRENCY??6),12));
+   let nextFile=0;
+   const scanFile=async(file:(typeof solidity)[number])=>{
+    if(!file.download_url)return {structure:analyzeSolidityStructure("",file.path),findings:[] as Opportunity[]};
+    const sourceText=await fetchRawFile(file.download_url,token),structure=analyzeSolidityStructure(sourceText,file.path);
+    structuralSummaries.push(structure);
     const detectorFindings=[...scanSoliditySource(sourceText,file.path),...structuralFindings(structure),...detectBrokenAccessControl(structure),...detectPhase3(structure)].map(finding=>({...finding,id:`${program.id}:${repository}:${revision.commitSha}:${finding.id}`,programId:program.id,repository,sourceRevision:revision.commitSha,scopeMatch:"yes" as const,payoutRoutes:payoutRoutesForProgram(program),evidence:[`program: ${program.id}`,`repository: ${repository}`,`revision: ${revision.commitSha}`,...finding.evidence]})) as Opportunity[];
-    const uniqueFindings=deduplicateFindings(detectorFindings);repoFindings+=uniqueFindings.length;evidenceGraphs.push(...buildCorrelatedEvidenceGraphs(structure,uniqueFindings));candidates.push(...uniqueFindings);
+    return {structure,findings:deduplicateFindings(detectorFindings)};
+   };
+   const workers=Array.from({length:Math.min(concurrency,solidity.length)},async()=>{
+    const local:{structure:ReturnType<typeof analyzeSolidityStructure>;findings:Opportunity[]}[]=[];
+    while(true){
+      const index=nextFile++;
+      if(index>=solidity.length)break;
+      const result=await scanFile(solidity[index]);
+      local.push(result);
+      console.log(JSON.stringify({event:"file-scanned",repository,file:solidity[index].path,progress:index+1,total:solidity.length}));
+    }
+    return local;
+   });
+   const workerResults=await Promise.all(workers);
+   for(const fileResult of workerResults.flat()){
+     repoFindings+=fileResult.findings.length;
+     evidenceGraphs.push(...buildCorrelatedEvidenceGraphs(fileResult.structure,fileResult.findings));
+     candidates.push(...fileResult.findings);
    }
    scannedRepositories++;console.log(JSON.stringify({event:"scan-complete",repository,solidityFiles:solidity.length,findings:repoFindings}));
   }catch(error){skippedRepositories++;const reason=error instanceof Error?error.message:String(error);if(reason.startsWith("GitHub API rate limit exhausted;")){rateLimited=true;console.error(JSON.stringify({event:"rate-limit",reason}));break;}candidates.push({type:"scan-error",programId:program.id,repository,reason});console.error(JSON.stringify({event:"scan-error",programId:program.id,repository,reason}));}
