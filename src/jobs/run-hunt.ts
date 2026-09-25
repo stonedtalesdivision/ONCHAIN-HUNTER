@@ -81,7 +81,7 @@ async function main(): Promise<void> {
         if (reason.startsWith("GitHub API rate limit exhausted;")) {
           rateLimited = true;
           console.error(JSON.stringify({ event: "rate-limit", reason }));
-          break outer;
+          break;
         }
         candidates.push({ type: "scan-error", programId: program.id, repository, reason });
         console.error(JSON.stringify({ event: "scan-error", programId: program.id, repository, reason }));
