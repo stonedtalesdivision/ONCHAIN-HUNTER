@@ -15,6 +15,7 @@ const monitoringArtifact = join(root, "artifacts", "monitoring", "latest-events.
 const investigationArtifact = join(root, "artifacts", "investigations", "latest.json");
 const orchestrationArtifact = join(root, "artifacts", "investigations", "orchestration.json");
 const validationArtifactDir = join(root, "artifacts", "validation-bundles");
+const workstationArtifact = join(root, "artifacts", "hunt", "research-workstation.json");
 const page = join(root, "dashboard", "index.html");
 let active: ChildProcess | null = null;
 let lastStartedAt: string | null = null;
@@ -92,6 +93,11 @@ createServer(async (req, res) => {
       try { monitoring = JSON.parse(await readFile(monitoringArtifact, "utf8")); } catch {}
       return json(res, 200, monitoring);
     }
+    if (req.method === "GET" && req.url === "/api/research-workstation") {
+      let workstation: unknown = { schemaVersion: "phase-14", humanReviewOnly: true, submissionEnabled: false, summary: { total: 0, blocked: 0, readyForReview: 0 }, items: [], reviewQueue: [] };
+      try { workstation = JSON.parse(await readFile(workstationArtifact, "utf8")); } catch {}
+      return json(res, 200, workstation);
+    }
     if (req.method === "GET" && req.url === "/api/bounty-intelligence") {
       let intelligence: unknown = { schemaVersion: "phase-13", total: 0, items: [] };
       try { const data = JSON.parse(await readFile(join(root, "artifacts", "hunt", "bounty-intelligence.json"), "utf8")); intelligence = data; } catch {}
@@ -153,7 +159,7 @@ createServer(async (req, res) => {
       let orchestration: unknown = { schemaVersion: "phase-10", executionEnabled: false, queue: [] };
       try { monitoring = JSON.parse(await readFile(monitoringArtifact, "utf8")); } catch {}
       try { orchestration = JSON.parse(await readFile(orchestrationArtifact, "utf8")); } catch {}
-      return json(res, 200, { running: Boolean(active), lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt, monitoring, orchestration, ledger: await readLedger() });
+      return json(res, 200, { running: Boolean(active), lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt, monitoring, orchestration, workstation, ledger: await readLedger() });
     }
     if (req.url?.startsWith("/api/hunt")) {
       let body: unknown = { programsDiscovered: 0, scannedRepositories: 0, candidateFindings: 0, skippedRepositories: 0, attemptedRepositories: 0, rateLimited: false, results: [] };
