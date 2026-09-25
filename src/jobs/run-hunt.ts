@@ -9,6 +9,7 @@ import { prioritizeScanTargets } from "../target-prioritizer.js";
 import { analyzeSolidityStructure, structuralFindings } from "../structural-analysis.js";
 import { detectBrokenAccessControl } from "../detectors/access-control.js";
 import { detectPhase3 } from "../detectors/phase3.js";
+import { buildEvidenceGraph, type EvidenceGraph } from "../evidence-graph.js";
 
 async function main(): Promise<void> {
   const hasToken = Boolean(process.env.GITHUB_TOKEN);
@@ -23,6 +24,7 @@ async function main(): Promise<void> {
 
   const candidates: unknown[] = [];
   const structuralSummaries: unknown[] = [];
+  const evidenceGraphs: EvidenceGraph[] = [];
   const payoutConfiguration = programs.filter(p => p.status === "active").map(program => ({
     programId: program.id,
     programName: program.name,
@@ -69,6 +71,8 @@ async function main(): Promise<void> {
 
           for (const finding of [...scanSoliditySource(sourceText, file.path), ...structuralFindings(structure), ...detectBrokenAccessControl(structure), ...detectPhase3(structure)]) {
             repoFindings++;
+            const matchedFunction = structure.functions.find(fn => finding.evidence.some(e => e.includes(`function ${fn.name} `)) || finding.title.includes(fn.name));
+            if (matchedFunction) evidenceGraphs.push(buildEvidenceGraph(structure, matchedFunction, finding));
             candidates.push({
               ...finding,
               id: `${program.id}:${repository}:${revision.commitSha}:${finding.id}`,
@@ -119,6 +123,7 @@ async function main(): Promise<void> {
     candidateFindings: candidates.filter((x: any) => !x.type).length,
     payoutConfiguration,
     structuralAnalysis: structuralSummaries,
+    evidenceGraphs,
     results: candidates
   };
   await writeFile(path, JSON.stringify(result, null, 2), "utf8");
