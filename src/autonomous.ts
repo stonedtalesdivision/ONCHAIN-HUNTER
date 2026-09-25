@@ -12,6 +12,7 @@ const root = process.cwd();
 const artifact = join(root, "artifacts", "hunt", "latest.json");
 const reviewQueueArtifact = join(root, "artifacts", "hunt", "review-queue.json");
 const monitoringArtifact = join(root, "artifacts", "monitoring", "latest-events.json");
+const investigationArtifact = join(root, "artifacts", "investigations", "latest.json");
 const page = join(root, "dashboard", "index.html");
 let active: ChildProcess | null = null;
 let lastStartedAt: string | null = null;
@@ -87,6 +88,11 @@ createServer(async (req, res) => {
       let monitoring: unknown = { schemaVersion: "phase-8", generatedAt: null, events: [] };
       try { monitoring = JSON.parse(await readFile(monitoringArtifact, "utf8")); } catch {}
       return json(res, 200, monitoring);
+    }
+    if (req.method === "GET" && req.url === "/api/investigations") {
+      let investigation: unknown = { schemaVersion: "phase-9", total: 0, records: [] };
+      try { investigation = JSON.parse(await readFile(investigationArtifact, "utf8")); } catch {}
+      return json(res, 200, investigation);
     }
     if (req.method === "GET" && req.url === "/api/ledger") {
       return json(res, 200, { entries: await readLedger() });
