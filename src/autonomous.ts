@@ -10,6 +10,7 @@ const intervalMinutes = Math.max(15, Number(process.env.HUNT_INTERVAL_MINUTES ??
 const limit = Math.max(1, Math.min(Number(process.env.ONCHAIN_HUNTER_LIMIT ?? 10), 20));
 const root = process.cwd();
 const artifact = join(root, "artifacts", "hunt", "latest.json");
+const reviewQueueArtifact = join(root, "artifacts", "hunt", "review-queue.json");
 const page = join(root, "dashboard", "index.html");
 let active: ChildProcess | null = null;
 let lastStartedAt: string | null = null;
@@ -37,6 +38,13 @@ async function runHunt(): Promise<boolean> {
   active.on("close", code => {
     lastExitCode = code;
     if (code !== 0) lastError = "Hunt exited with code " + code;
+    if (code === 0) {
+      const reportJob = join(root, "dist", "jobs", "generate-hunt-reports.js");
+      const report = spawn(process.execPath, [reportJob, artifact], { cwd: root, env: { ...process.env }, stdio: ["ignore", "pipe", "pipe"] });
+      report.stdout?.on("data", d => process.stdout.write(d));
+      report.stderr?.on("data", d => process.stderr.write(d));
+      report.on("error", error => console.error(JSON.stringify({ event: "report-generation-error", error: error instanceof Error ? error.message : String(error) })));
+    }
     console.log(JSON.stringify({ event: "hunt-exit", code }));
     active = null;
     if (code !== 0 && !retryTimer) {
@@ -68,6 +76,11 @@ createServer(async (req, res) => {
     }
     if (req.method === "GET" && req.url === "/api/health") {
       return json(res, 200, { ok: true, running: Boolean(active), lastStartedAt, lastExitCode, lastError });
+    }
+    if (req.method === "GET" && req.url === "/api/review-queue") {
+      let queue: unknown = { schemaVersion: "phase-7", submissionEnabled: false, totalReports: 0, reports: [] };
+      try { queue = JSON.parse(await readFile(reviewQueueArtifact, "utf8")); } catch {}
+      return json(res, 200, queue);
     }
     if (req.method === "GET" && req.url === "/api/ledger") {
       return json(res, 200, { entries: await readLedger() });
