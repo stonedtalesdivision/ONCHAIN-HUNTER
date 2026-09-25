@@ -23,7 +23,9 @@ export function matchEvidencePackage(pkg:EvidencePackage,programs:BountyProgram[
   else reasons.push("Severity/impact limits require program-page review.");
   const scope:BountyMatch["scope"]=exact?"exact-repository":repo?"repository-not-listed":"unknown";
   const eligibility:BountyMatch["eligibility"]=exact?"review-required":"scope-mismatch";
-  return {programId:p.id,programName:p.name,programUrl:p.url,repository:repo||null,scope,impact,severity,payoutRoutes:payout(p),requirements:{pocRequired:requirements?.pocRequired??"unknown",kycRequired:requirements?.kycRequired??"unknown",prohibitedActivities:requirements?.prohibitedActivities??[],impactCategories:requirements?.impactCategories??[],knownIssueNotes:requirements?.knownIssueNotes??[],sourceUrl:requirements?.sourceUrl??p.url},eligibility,reasons};
+  const pocRequired:BountyMatch["requirements"]["pocRequired"]=requirements?.pocRequired===true?true:"unknown";
+  const kycRequired:BountyMatch["requirements"]["kycRequired"]=requirements?.kycRequired===true?true:"unknown";
+  return {programId:p.id,programName:p.name,programUrl:p.url,repository:repo||null,scope,impact,severity,payoutRoutes:payout(p),requirements:{pocRequired,kycRequired,prohibitedActivities:requirements?.prohibitedActivities??[],impactCategories:requirements?.impactCategories??[],knownIssueNotes:requirements?.knownIssueNotes??[],sourceUrl:requirements?.sourceUrl??p.url},eligibility,reasons};
  }).filter(m=>m.scope==="exact-repository"||m.impact==="matched");
 }
 
