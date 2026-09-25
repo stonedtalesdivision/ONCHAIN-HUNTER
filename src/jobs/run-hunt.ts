@@ -7,6 +7,7 @@ import { writeFile, mkdir } from "node:fs/promises";
 import { payoutRoutesForProgram } from "../payout.js";
 import { prioritizeScanTargets } from "../target-prioritizer.js";
 import { analyzeSolidityStructure, structuralFindings } from "../structural-analysis.js";
+import { detectBrokenAccessControl } from "../detectors/access-control.js";
 
 async function main(): Promise<void> {
   const hasToken = Boolean(process.env.GITHUB_TOKEN);
@@ -54,7 +55,7 @@ async function main(): Promise<void> {
       try {
         const revision = await resolveRepositoryRevision(repository, ref, token);
         const files = await listRepositoryFiles(repository, token, ref);
-        const solidity = files.filter(f => /\.(sol|vy)$/i.test(f.path));
+        const solidity = files.filter(f => /\.sol$/i.test(f.path));
         let repoFindings = 0;
 
         const structuralFiles: unknown[] = [];
@@ -65,7 +66,7 @@ async function main(): Promise<void> {
           structuralFiles.push(structure);
           structuralSummaries.push(structure);
 
-          for (const finding of [...scanSoliditySource(sourceText, file.path), ...structuralFindings(structure)]) {
+          for (const finding of [...scanSoliditySource(sourceText, file.path), ...structuralFindings(structure), ...detectBrokenAccessControl(structure)]) {
             repoFindings++;
             candidates.push({
               ...finding,
