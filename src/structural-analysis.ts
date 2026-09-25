@@ -11,7 +11,18 @@ export type StructuralFunction = {
   externalCalls: string[];
   delegateCalls: string[];
   valueTransfers: string[];
+  tokenTransfers: string[];
+  signatureOperations: string[];
+  nonceWrites: string[];
+  oracleReads: string[];
+  accountingSignals: string[];
+  upgradeOperations: string[];
   userControlledInputs: string[];
+  hasReentrancyGuard: boolean;
+  stateWriteAfterExternalCall: boolean;
+  initializer: boolean;
+  initializerGuard: boolean;
+  businessCritical: boolean;
   sensitive: boolean;
   startLine: number;
   endLine: number;
@@ -68,8 +79,7 @@ function modifiersOf(signature: string, parameterText: string): string[] {
 }
 
 function parameterNames(parameterText: string): string[] {
-  return parameterText
-    .split(",")
+  return parameterText.split(",")
     .map(part => part.trim().match(/(?:^|\s)([A-Za-z_][A-Za-z0-9_]*)\s*$/)?.[1])
     .filter((x): x is string => Boolean(x));
 }
@@ -82,9 +92,7 @@ function hasAccessControl(signature: string, body: string): boolean {
 
 function findStateVariables(clean: string): string[] {
   const variables: string[] = [];
-  for (const m of clean.matchAll(/\b(?:uint(?:8|16|32|64|128|256)?|int(?:8|16|32|64|128|256)?|address|bool|bytes(?:32)?|mapping\s*\([^;]+\)|string)\s+(?:public|private|internal)?\s*(?:immutable|constant)?\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?:=[^;]*)?;/g)) {
-    variables.push(m[1]);
-  }
+  for (const m of clean.matchAll(/\b(?:uint(?:8|16|32|64|128|256)?|int(?:8|16|32|64|128|256)?|address|bool|bytes(?:32)?|mapping\s*\([^;]+\)|string)\s+(?:public|private|internal)?\s*(?:immutable|constant)?\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?:=[^;]*)?;/g)) variables.push(m[1]);
   return [...new Set(variables)];
 }
 
@@ -103,97 +111,70 @@ export function analyzeSolidityStructure(source: string, file = "unknown.sol"): 
     const body = clean.slice(open + 1, close);
     const params = parameterNames(match[2]);
     const modifiers = modifiersOf(signature, match[2]);
-    const stateWrites = [...new Set(
-      [...body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)(?:\s*\[[^\]]+\])?\s*(?:\+=|-=|\*=|\/=|%=|=)/g)]
-        .map(m => m[1])
-        .filter(name => stateVariables.includes(name))
-    )];
+    const stateWrites = [...new Set([...body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)(?:\s*\[[^\]]+\])?\s*(?:\+=|-=|\*=|\/=|%=|=)/g)]
+      .map(m => m[1]).filter(name => stateVariables.includes(name)))];
     const externalCalls = [...new Set([...body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)\.(?:call|callcode|staticcall)\s*(?:\{|\()/g)].map(m => m[1]))];
     const delegateCalls = [...new Set([...body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)\.delegatecall\s*\(/g)].map(m => m[1]))];
     const valueTransfers = [...new Set([
       ...[...body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)\.call\s*\{\s*value\s*:/g)].map(m => m[1]),
       ...[...body.matchAll(/\b(?:transfer|send)\s*\(/g)].map(() => "native-transfer")
     ])];
+    const tokenTransfers = [...new Set([...body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)\.(transfer|transferFrom|safeTransfer|safeTransferFrom|approve|safeApprove)\s*\(/g)]
+      .map(m => `${m[1]}.${m[2]}`))];
+    const signatureOperations = [...new Set([...body.matchAll(/\b(?:ecrecover|ECDSA\.(?:recover|toEthSignedMessageHash)|SignatureChecker\.|permit\s*\()/g)].map(m => m[0].replace(/\s+/g, "")))];
+    const nonceWrites = [...new Set([...body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*nonce[A-Za-z0-9_]*)\s*(?:\+\+|--|\+=|=)/gi)].map(m => m[1]))];
+    const oracleReads = [...new Set([...body.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)\.(?:latestRoundData|getPrice|getAssetPrice|latestAnswer|consult|quote)\s*\(/g)].map(m => m[1]))];
+    const accountingSignals = [...new Set([...body.matchAll(/\b(?:balanceOf|totalSupply|totalAssets|totalShares|debt|shares|assets|liquidity|reserve|collateral|balance)\b/gi)].map(m => m[0].toLowerCase()))];
+    const upgradeOperations = [...new Set([...body.matchAll(/\b(?:upgradeTo|upgradeToAndCall|setImplementation|changeAdmin|_upgradeTo|_setImplementation)\s*\(/g)].map(m => m[0].replace(/\s+/g, "")))];
     const userControlledInputs = params.filter(p => TARGET_NAMES.test(p) || VALUE_NAMES.test(p));
+    const externalPositions = [...body.matchAll(/\b[A-Za-z_][A-Za-z0-9_]*\.(?:call|callcode|staticcall|delegatecall)\s*(?:\{|\()/g)].map(m => m.index ?? 0);
+    const lastExternal = externalPositions.length ? Math.max(...externalPositions) : -1;
+    const firstStateWrite = [...body.matchAll(/\b(?:[A-Za-z_][A-Za-z0-9_]*)(?:\s*\[[^\]]+\])?\s*(?:\+=|-=|\*=|\/=|%=|=)/g)].map(m => m.index ?? 0)[0] ?? -1;
+    const hasReentrancyGuard = /\bnonReentrant\b/.test(signature) || /\b(?:ReentrancyGuard|reentrancyGuard)\b/.test(body);
+    const initializer = /^(?:initialize|init)$/i.test(match[1]);
+    const initializerGuard = /\b(?:initializer|reinitializer)\b/.test(signature) || /\b_initialized\b|\b_initializedVersion\b/.test(body);
+    const businessCritical = /^(?:withdraw|withdrawAll|sweep|rescue|claim|mint|burn|execute|executeBatch|settle|liquidate|borrow|repay|deposit|redeem|swap|flashLoan|flashBorrow|vote|propose)$/i.test(match[1]);
+
     functions.push({
-      name: match[1],
-      visibility: visibilityOf(signature),
-      mutability: mutabilityOf(signature),
-      modifiers,
-      parameters: params,
-      accessControlled: hasAccessControl(signature, body),
-      stateWrites,
-      externalCalls,
-      delegateCalls,
-      valueTransfers,
-      userControlledInputs,
-      sensitive: SENSITIVE_NAMES.test(match[1]),
-      startLine: lineAt(source, match.index!),
-      endLine: lineAt(source, close)
+      name: match[1], visibility: visibilityOf(signature), mutability: mutabilityOf(signature),
+      modifiers, parameters: params, accessControlled: hasAccessControl(signature, body),
+      stateWrites, externalCalls, delegateCalls, valueTransfers, tokenTransfers,
+      signatureOperations, nonceWrites, oracleReads, accountingSignals, upgradeOperations,
+      userControlledInputs, hasReentrancyGuard,
+      stateWriteAfterExternalCall: lastExternal >= 0 && firstStateWrite > lastExternal,
+      initializer, initializerGuard, businessCritical, sensitive: SENSITIVE_NAMES.test(match[1]),
+      startLine: lineAt(source, match.index!), endLine: lineAt(source, close)
     });
   }
-
   return { file, contracts: [...new Set(contracts)], stateVariables, functions };
 }
 
 export function structuralFindings(analysis: StructuralFileAnalysis): Opportunity[] {
   const findings: Opportunity[] = [];
-
   for (const fn of analysis.functions) {
     if (!["external", "public"].includes(fn.visibility) || fn.mutability === "view" || fn.mutability === "pure") continue;
-
     const evidenceBase = [
       `function ${fn.name} (${fn.visibility}, ${fn.mutability}) lines ${fn.startLine}-${fn.endLine}`,
-      `parameters=${fn.parameters.join(",") || "none"}`,
-      `accessControl=${fn.accessControlled}`,
-      `stateWrites=${fn.stateWrites.join(",") || "none"}`,
-      `externalCalls=${fn.externalCalls.join(",") || "none"}`,
-      `delegateCalls=${fn.delegateCalls.join(",") || "none"}`,
-      `valueTransfers=${fn.valueTransfers.join(",") || "none"}`
+      `parameters=${fn.parameters.join(",") || "none"}`, `accessControl=${fn.accessControlled}`,
+      `stateWrites=${fn.stateWrites.join(",") || "none"}`, `externalCalls=${fn.externalCalls.join(",") || "none"}`,
+      `delegateCalls=${fn.delegateCalls.join(",") || "none"}`, `valueTransfers=${fn.valueTransfers.join(",") || "none"}`
     ];
-
-    if (fn.sensitive && !fn.accessControlled) {
-      findings.push({
-        id: `structural:unrestricted-sensitive-function:${analysis.file}:${fn.startLine}`,
-        programId: "unknown",
-        title: `Sensitive externally reachable function without detected access control: ${fn.name}`,
-        category: "access-control",
-        severity: "high" as Severity,
-        confidence: fn.stateWrites.length || fn.valueTransfers.length ? 0.72 : 0.62,
-        evidence: [...evidenceBase, "review candidate: sensitive function name plus no detected authorization guard."],
-        status: "new",
-        createdAt: new Date().toISOString()
-      });
-    }
-
-    if (fn.delegateCalls.length && fn.userControlledInputs.length && !fn.accessControlled) {
-      findings.push({
-        id: `structural:user-controlled-delegatecall:${analysis.file}:${fn.startLine}`,
-        programId: "unknown",
-        title: `User-controlled delegatecall path in externally reachable function: ${fn.name}`,
-        category: "external-call",
-        severity: "critical" as Severity,
-        confidence: 0.84,
-        evidence: [...evidenceBase, "review candidate: user-influenced parameter and delegatecall occur in the same externally reachable function without detected access control."],
-        status: "new",
-        createdAt: new Date().toISOString()
-      });
-    }
-
-    if (fn.externalCalls.length && fn.valueTransfers.length && fn.userControlledInputs.length && !fn.accessControlled) {
-      findings.push({
-        id: `structural:user-controlled-value-call:${analysis.file}:${fn.startLine}`,
-        programId: "unknown",
-        title: `User-controlled value-forwarding external call path: ${fn.name}`,
-        category: "external-call",
-        severity: "high" as Severity,
-        confidence: 0.78,
-        evidence: [...evidenceBase, "review candidate: external call forwards value and accepts target/value-like user input without detected access control."],
-        status: "new",
-        createdAt: new Date().toISOString()
-      });
-    }
+    if (fn.sensitive && !fn.accessControlled) findings.push({
+      id: `structural:unrestricted-sensitive-function:${analysis.file}:${fn.startLine}`, programId:"unknown",
+      title:`Sensitive externally reachable function without detected access control: ${fn.name}`, category:"access-control",
+      severity:"high" as Severity, confidence:fn.stateWrites.length || fn.valueTransfers.length ? .72 : .62,
+      evidence:[...evidenceBase,"review candidate: sensitive function name plus no detected authorization guard."],status:"new",createdAt:new Date().toISOString()
+    });
+    if (fn.delegateCalls.length && fn.userControlledInputs.length && !fn.accessControlled) findings.push({
+      id:`structural:user-controlled-delegatecall:${analysis.file}:${fn.startLine}`,programId:"unknown",
+      title:`User-controlled delegatecall path in externally reachable function: ${fn.name}`,category:"external-call",
+      severity:"critical" as Severity,confidence:.84,evidence:[...evidenceBase,"review candidate: user-influenced parameter and delegatecall occur in the same externally reachable function without detected access control."],status:"new",createdAt:new Date().toISOString()
+    });
+    if (fn.externalCalls.length && fn.valueTransfers.length && fn.userControlledInputs.length && !fn.accessControlled) findings.push({
+      id:`structural:user-controlled-value-call:${analysis.file}:${fn.startLine}`,programId:"unknown",
+      title:`User-controlled value-forwarding external call path: ${fn.name}`,category:"external-call",
+      severity:"high" as Severity,confidence:.78,evidence:[...evidenceBase,"review candidate: external call forwards value and accepts target/value-like user input without detected access control."],status:"new",createdAt:new Date().toISOString()
+    });
   }
-
   return findings;
 }
