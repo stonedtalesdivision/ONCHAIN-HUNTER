@@ -8,6 +8,7 @@ import { payoutRoutesForProgram } from "../payout.js";
 import { prioritizeScanTargets } from "../target-prioritizer.js";
 import { analyzeSolidityStructure, structuralFindings } from "../structural-analysis.js";
 import { detectBrokenAccessControl } from "../detectors/access-control.js";
+import { detectPhase3 } from "../detectors/phase3.js";
 
 async function main(): Promise<void> {
   const hasToken = Boolean(process.env.GITHUB_TOKEN);
@@ -66,7 +67,7 @@ async function main(): Promise<void> {
           structuralFiles.push(structure);
           structuralSummaries.push(structure);
 
-          for (const finding of [...scanSoliditySource(sourceText, file.path), ...structuralFindings(structure), ...detectBrokenAccessControl(structure)]) {
+          for (const finding of [...scanSoliditySource(sourceText, file.path), ...structuralFindings(structure), ...detectBrokenAccessControl(structure), ...detectPhase3(structure)]) {
             repoFindings++;
             candidates.push({
               ...finding,
