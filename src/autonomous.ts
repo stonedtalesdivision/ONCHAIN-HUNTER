@@ -92,6 +92,11 @@ createServer(async (req, res) => {
       try { monitoring = JSON.parse(await readFile(monitoringArtifact, "utf8")); } catch {}
       return json(res, 200, monitoring);
     }
+    if (req.method === "GET" && req.url === "/api/bounty-intelligence") {
+      let intelligence: unknown = { schemaVersion: "phase-13", total: 0, items: [] };
+      try { const data = JSON.parse(await readFile(join(root, "artifacts", "hunt", "bounty-intelligence.json"), "utf8")); intelligence = data; } catch {}
+      return json(res, 200, intelligence);
+    }
     if (req.method === "GET" && req.url === "/api/proof") {
       let proof: unknown = { schemaVersion: "phase-11", total: 0, strong: 0 };
       try { const hunt = JSON.parse(await readFile(artifact, "utf8")); proof = hunt.proof ?? proof; } catch {}
