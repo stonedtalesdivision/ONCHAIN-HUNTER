@@ -9,7 +9,7 @@ import { prioritizeScanTargets } from "../target-prioritizer.js";
 import { analyzeSolidityStructure, structuralFindings } from "../structural-analysis.js";
 import { detectBrokenAccessControl } from "../detectors/access-control.js";
 import { detectPhase3 } from "../detectors/phase3.js";
-import { buildCorrelatedEvidenceGraphs, deduplicateFindings, mergeEvidenceGraphs, rankEvidenceGraphs, type EvidenceGraph } from "../evidence-graph.js";
+import { buildCorrelatedEvidenceGraphs, deduplicateFindings, mergeEvidenceGraphs, rankEvidenceGraphs, linkCrossFunctionGraphs, type EvidenceGraph } from "../evidence-graph.js";
 import type { Opportunity } from "../types.js";
 
 async function main(): Promise<void> {
@@ -123,8 +123,8 @@ async function main(): Promise<void> {
     candidateFindings: candidates.filter((x: any) => !x.type).length,
     payoutConfiguration,
     structuralAnalysis: structuralSummaries,
-    evidenceGraphs: rankEvidenceGraphs(mergeEvidenceGraphs(evidenceGraphs)),
-    evidenceGraphSummary: { total: evidenceGraphs.length, unique: mergeEvidenceGraphs(evidenceGraphs).length, critical: evidenceGraphs.filter(g => g.severity === "critical").length, high: evidenceGraphs.filter(g => g.severity === "high").length },
+    evidenceGraphs: rankEvidenceGraphs(linkCrossFunctionGraphs(mergeEvidenceGraphs(evidenceGraphs))),
+    evidenceGraphSummary: { total: evidenceGraphs.length, unique: mergeEvidenceGraphs(evidenceGraphs).length, crossFunctionChains: linkCrossFunctionGraphs(mergeEvidenceGraphs(evidenceGraphs)).filter(g => g.crossFunctionPaths.length).length, critical: evidenceGraphs.filter(g => g.severity === "critical").length, high: evidenceGraphs.filter(g => g.severity === "high").length },
     results: candidates
   };
   await writeFile(path, JSON.stringify(result, null, 2), "utf8");
