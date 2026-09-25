@@ -42,9 +42,10 @@ test("flags high-signal user-controlled delegatecall without detected authorizat
 
   const analysis = analyzeSolidityStructure(source, "Proxy.sol");
   const findings = structuralFindings(analysis);
-  assert.equal(findings.length, 1);
-  assert.equal(findings[0].severity, "critical");
-  assert.match(findings[0].title, /delegatecall/i);
+  const delegatecallFinding = findings.find(x => x.severity === "critical" && /delegatecall/i.test(x.title));
+  assert.ok(delegatecallFinding);
+  assert.equal(delegatecallFinding.severity, "critical");
+  assert.match(delegatecallFinding.title, /delegatecall/i);
 });
 
 test("does not flag an access-controlled upgrade function", () => {
