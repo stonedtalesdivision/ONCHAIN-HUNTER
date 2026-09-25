@@ -62,11 +62,10 @@ export function buildResearchWorkstation(
     const inv = investigationFor(pkg, investigations);
     const proof = proofs.find(p => p.packageId === pkg.packageId);
     const validation = validationBundles.find(v => v.packageId === pkg.packageId);
-    const intel = intelligence.find(i => i.programId === pkg.programId && (i.repository === pkg.repository || i.repository === null));
+    const intel = intelligence.find(i => i.repository === pkg.repository || i.repository === null);
     const blockers = [...(inv?.blockers ?? [])];
     if (!proof) blockers.push("proof dossier missing");
     if (!validation) blockers.push("validation bundle missing");
-    if (pkg.bountyMatches?.length === 0) blockers.push("no bounty match recorded");
     const nextActions = [
       "Confirm exact bounty scope and source revision",
       "Review evidence graph and proof claims",
@@ -85,7 +84,7 @@ export function buildResearchWorkstation(
       priority: inv?.priority ?? 0,
       repository: pkg.repository,
       sourceRevision: pkg.sourceRevision,
-      bountyProgramId: pkg.programId,
+      bountyProgramId: intel?.programId,
       bountyProgramName: intel?.programName,
       intelligenceScore: intel?.intelligenceScore,
       proofScore: proof?.proofScore,
