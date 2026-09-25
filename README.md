@@ -110,3 +110,16 @@ Phase 9 turns evidence packages into persistent investigation records for human 
 - A finding that appears on a new source revision is explicitly marked for revalidation.
 - Review reports incorporate investigation priority and missing-evidence information.
 - Phase 9 does not execute live exploits or submit bounty reports automatically.
+
+
+## Phase 11 — Deep-Dive & Proof Engine
+
+Phase 11 converts each evidence package into a deterministic proof dossier containing scope, reachability, impact and reproduction claims, evidence references, gaps and a proof score. It never declares a finding exploitable automatically; human review remains required.
+
+Artifacts: `artifacts/validation-bundles/*.proof.json`. API: `GET /api/proof`.
+
+## Phase 12 — Local Validation Bundles
+
+Phase 12 prepares an isolated Foundry validation harness for each evidence package and records the proof dossier alongside it. Execution remains disabled by default and is limited to explicitly authorized local environments. No live-network traffic or automatic bounty submission is performed.
+
+Artifacts: `artifacts/validation-bundles/` and `test/onchain-hunter/`. API: `GET /api/validation-bundles`.
