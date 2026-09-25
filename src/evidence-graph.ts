@@ -115,7 +115,7 @@ export function linkCrossFunctionGraphs(graphs: EvidenceGraph[]): EvidenceGraph[
     for(const n of (Array.isArray(graph.nodes)?graph.nodes:[]).filter(n=>n.kind==="state"||n.kind==="asset")){const pool=n.kind==="state"?byState.get(n.label)??[]:byAsset.get(n.label)??[];for(const other of pool)if(other!==graph){related.add(other);paths.push([graph.attackPath[0]??"entry",`shared ${n.kind}: ${n.label}`,other.attackPath.at(-1)??"downstream impact"]);}}
     graph.crossFunctionPaths=paths.slice(0,20);graph.chainConfidence=Math.min(.99,graph.confidence+Math.min(.12,related.size*.03));
     if(related.size)graph.reviewQuestions.push("Do related functions sharing the same state or asset signal form one exploitable transaction path?");
-    if(related.size)for(const other of related){for(const step of other.transactionSequence.filter(s=>s.role==="entry"||s.role==="internal-call")){if(!graph.transactionSequence.some(s=>s.function===step.function&&s.role===step.role))graph.transactionSequence.push({...step,order:graph.transactionSequence.length+1});}}
+    if(related.size)for(const other of related){for(const step of (Array.isArray(other.transactionSequence)?other.transactionSequence:[]).filter(s=>s.role==="entry"||s.role==="internal-call")){if(!graph.transactionSequence.some(s=>s.function===step.function&&s.role===step.role))graph.transactionSequence.push({...step,order:graph.transactionSequence.length+1});}}
   }
   return graphs;
 }
