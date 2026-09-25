@@ -22,7 +22,8 @@
     "autonomous": "tsx src/autonomous.ts",
     "validate:suite": "tsx src/jobs/prepare-validation-suite.ts",
     "bounty:match": "tsx src/jobs/run-bounty-matching.ts",
-    "report:hunt": "tsx src/jobs/generate-hunt-reports.ts"
+    "report:hunt": "tsx src/jobs/generate-hunt-reports.ts",
+    "investigate:orchestrate": "tsx src/investigation-orchestrator.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.2",
