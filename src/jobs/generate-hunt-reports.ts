@@ -1,8 +1,8 @@
 import {readFile,writeFile,mkdir} from "node:fs/promises";
 import {buildDisclosureReport,type DisclosureReport} from "../disclosure-report.js";
+import {loadInvestigationState} from "../investigation.js";
 import type {EvidencePackage} from "../evidence-graph.js";
 import type {BountyMatch} from "../bounty-matcher.js";
-const huntPath=process.argv[2]??"artifacts/hunt/latest.json";
 const hunt=JSON.parse(await readFile(huntPath,"utf8")) as {evidencePackages?:EvidencePackage[];bountyMatches?:Array<{packageId:string;findingId:string;matches:BountyMatch[]}>};
 const packages=hunt.evidencePackages??[];const groups=hunt.bountyMatches??[];const investigation=await loadInvestigationState();await mkdir("artifacts/reports",{recursive:true});
 const reports:DisclosureReport[]=[];
