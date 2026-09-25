@@ -90,6 +90,7 @@ createServer(async (req, res) => {
     if (req.method === "GET" && req.url === "/api/monitoring") {
       let monitoring: unknown = { schemaVersion: "phase-8", generatedAt: null, events: [] };
       let orchestration: unknown = { schemaVersion: "phase-10", executionEnabled: false, queue: [] };
+      let workstation: unknown = { schemaVersion: "phase-14", humanReviewOnly: true, submissionEnabled: false, summary: { total: 0, blocked: 0, readyForReview: 0 }, items: [], reviewQueue: [] };
       try { monitoring = JSON.parse(await readFile(monitoringArtifact, "utf8")); } catch {}
       return json(res, 200, monitoring);
     }
