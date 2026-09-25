@@ -14,6 +14,7 @@ const reviewQueueArtifact = join(root, "artifacts", "hunt", "review-queue.json")
 const monitoringArtifact = join(root, "artifacts", "monitoring", "latest-events.json");
 const investigationArtifact = join(root, "artifacts", "investigations", "latest.json");
 const orchestrationArtifact = join(root, "artifacts", "investigations", "orchestration.json");
+const validationArtifactDir = join(root, "artifacts", "validation-bundles");
 const page = join(root, "dashboard", "index.html");
 let active: ChildProcess | null = null;
 let lastStartedAt: string | null = null;
@@ -90,6 +91,14 @@ createServer(async (req, res) => {
       let orchestration: unknown = { schemaVersion: "phase-10", executionEnabled: false, queue: [] };
       try { monitoring = JSON.parse(await readFile(monitoringArtifact, "utf8")); } catch {}
       return json(res, 200, monitoring);
+    }
+    if (req.method === "GET" && req.url === "/api/proof") {
+      let proof: unknown = { schemaVersion: "phase-11", total: 0, strong: 0 };
+      try { const hunt = JSON.parse(await readFile(artifact, "utf8")); proof = hunt.proof ?? proof; } catch {}
+      return json(res, 200, proof);
+    }
+    if (req.method === "GET" && req.url === "/api/validation-bundles") {
+      return json(res, 200, { schemaVersion: "phase-12", directory: validationArtifactDir, executionEnabled: false });
     }
     if (req.method === "GET" && req.url === "/api/investigation-orchestration") {
       let orchestration: unknown = { schemaVersion: "phase-10", executionEnabled: false, queue: [] };
