@@ -24,6 +24,8 @@ export type EvidenceGraph = {
   exploitability: "direct" | "conditional" | "uncertain";
   scopeConfidence: "exact-revision" | "repository" | "unknown";
   deduplicationKey: string;
+  crossFunctionPaths: string[][];
+  chainConfidence: number;
 };
 
 function node(id: string, kind: EvidenceNode["kind"], label: string, evidence: string[] = []): EvidenceNode {
@@ -117,7 +119,9 @@ function graphForFunction(analysis: StructuralFileAnalysis, fn: StructuralFuncti
     impact,
     exploitability,
     scopeConfidence,
-    deduplicationKey: `${primary.repository ?? ""}:${primary.sourceRevision ?? ""}:${analysis.file}:${fn.name}:${fn.startLine}`
+    deduplicationKey: `${primary.repository ?? ""}:${primary.sourceRevision ?? ""}:${analysis.file}:${fn.name}:${fn.startLine}`,
+    crossFunctionPaths: [],
+    chainConfidence: Math.min(0.99, Math.max(...findings.map(f => f.confidence)))
   };
 }
 
@@ -169,6 +173,27 @@ export function deduplicateFindings(findings: Opportunity[]): Opportunity[] {
 export function buildAttackChains(analysis: StructuralFileAnalysis, findings: Opportunity[]): EvidenceGraph[] {
   const relevant = findings.filter(f => f.repository || f.sourceRevision);
   return buildCorrelatedEvidenceGraphs(analysis, relevant);
+}
+
+export function linkCrossFunctionGraphs(graphs: EvidenceGraph[]): EvidenceGraph[] {
+  const byState = new Map<string, EvidenceGraph[]>();
+  const byAsset = new Map<string, EvidenceGraph[]>();
+  for (const graph of graphs) {
+    for (const n of graph.nodes.filter(n => n.kind === "state")) { const list=byState.get(n.label)??[]; list.push(graph); byState.set(n.label,list); }
+    for (const n of graph.nodes.filter(n => n.kind === "asset")) { const list=byAsset.get(n.label)??[]; list.push(graph); byAsset.set(n.label,list); }
+  }
+  for (const graph of graphs) {
+    const paths: string[][] = [];
+    const related = new Set<EvidenceGraph>();
+    for (const n of graph.nodes.filter(n => n.kind === "state" || n.kind === "asset")) {
+      const pool = n.kind === "state" ? byState.get(n.label) ?? [] : byAsset.get(n.label) ?? [];
+      for (const other of pool) if (other !== graph) { related.add(other); paths.push([graph.attackPath[0] ?? "entry", `shared ${n.kind}: ${n.label}`, other.attackPath.at(-1) ?? "downstream impact"]); }
+    }
+    graph.crossFunctionPaths = paths.slice(0, 20);
+    graph.chainConfidence = Math.min(0.99, graph.confidence + Math.min(0.12, related.size * 0.03));
+    if (related.size) graph.reviewQuestions.push("Do related functions sharing the same state or asset signal form one exploitable transaction path?");
+  }
+  return graphs;
 }
 
 export function rankEvidenceGraphs(graphs: EvidenceGraph[]): EvidenceGraph[] {
