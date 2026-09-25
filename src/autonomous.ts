@@ -11,6 +11,7 @@ const limit = Math.max(1, Math.min(Number(process.env.ONCHAIN_HUNTER_LIMIT ?? 10
 const root = process.cwd();
 const artifact = join(root, "artifacts", "hunt", "latest.json");
 const reviewQueueArtifact = join(root, "artifacts", "hunt", "review-queue.json");
+const monitoringArtifact = join(root, "artifacts", "monitoring", "latest-events.json");
 const page = join(root, "dashboard", "index.html");
 let active: ChildProcess | null = null;
 let lastStartedAt: string | null = null;
@@ -82,6 +83,11 @@ createServer(async (req, res) => {
       try { queue = JSON.parse(await readFile(reviewQueueArtifact, "utf8")); } catch {}
       return json(res, 200, queue);
     }
+    if (req.method === "GET" && req.url === "/api/monitoring") {
+      let monitoring: unknown = { schemaVersion: "phase-8", generatedAt: null, events: [] };
+      try { monitoring = JSON.parse(await readFile(monitoringArtifact, "utf8")); } catch {}
+      return json(res, 200, monitoring);
+    }
     if (req.method === "GET" && req.url === "/api/ledger") {
       return json(res, 200, { entries: await readLedger() });
     }
@@ -116,7 +122,7 @@ createServer(async (req, res) => {
     if (req.url?.startsWith("/api/status")) {
       let hunt: unknown = null;
       try { hunt = JSON.parse(await readFile(artifact, "utf8")); } catch {}
-      return json(res, 200, { running: Boolean(active), lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt, ledger: await readLedger() });
+      let monitoring: unknown = { schemaVersion: "phase-8", generatedAt: null, events: [] };\n      try { monitoring = JSON.parse(await readFile(monitoringArtifact, "utf8")); } catch {}\n      return json(res, 200, { running: Boolean(active), lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt, monitoring, ledger: await readLedger() });
     }
     if (req.url?.startsWith("/api/hunt")) {
       let body: unknown = { programsDiscovered: 0, scannedRepositories: 0, candidateFindings: 0, skippedRepositories: 0, attemptedRepositories: 0, rateLimited: false, results: [] };
