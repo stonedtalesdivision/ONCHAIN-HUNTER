@@ -5,6 +5,7 @@ import { resolveRepositoryRevision, listRepositoryFiles, fetchRawFile } from "..
 import { scanSoliditySource } from "../scanner.js";
 import { writeFile, mkdir } from "node:fs/promises";
 import { payoutRoutesForProgram } from "../payout.js";
+import { prioritizeScanTargets } from "../target-prioritizer.js";
 
 async function main(): Promise<void> {
   const hasToken = Boolean(process.env.GITHUB_TOKEN);
@@ -28,20 +29,26 @@ async function main(): Promise<void> {
   let attemptedRepositories = 0;
   let rateLimited = false;
 
-  outer:
-  for (const program of programs.filter(p => p.status === "active")) {
-    for (const repository of program.sourceRepos) {
-      const constraint = inferVersionConstraintForRepository(program, repository);
-      const ref = requiredScanRef(constraint);
-      if (!ref) {
-        skippedRepositories++;
-        candidates.push({ type: "scope-review-required", programId: program.id, programName: program.name, repository, reason: "No exact release/commit was exposed by the current catalog data." });
-        continue;
-      }
-      if (attemptedRepositories >= limit) break outer;
-      attemptedRepositories++;
+  const activePrograms = programs.filter(p => p.status === "active");
+  const allRepositoryCount = activePrograms.reduce((total, program) => total + program.sourceRepos.length, 0);
+  const targets = prioritizeScanTargets(activePrograms);
+  const scopeReviewRequired = Math.max(0, allRepositoryCount - targets.length);
+  const selectedTargets = targets.slice(0, limit);
 
-      console.log(JSON.stringify({ event: "scan-start", programId: program.id, repository, ref }));
+  console.log(JSON.stringify({
+    event: "targets-prioritized",
+    activePrograms: activePrograms.length,
+    repositoriesAvailable: allRepositoryCount,
+    exactScopeTargets: targets.length,
+    scopeReviewRequired,
+    selected: selectedTargets.map(target => ({ programId: target.program.id, repository: target.repository, ref: target.ref, score: target.score }))
+  }));
+
+  for (const target of selectedTargets) {
+    const { program, repository, ref } = target;
+    attemptedRepositories++;
+
+    console.log(JSON.stringify({ event: "scan-start", programId: program.id, repository, ref, priorityScore: target.score, priorityReasons: target.reasons }));
       try {
         const revision = await resolveRepositoryRevision(repository, ref, token);
         const files = await listRepositoryFiles(repository, token, ref);
@@ -79,7 +86,6 @@ async function main(): Promise<void> {
         candidates.push({ type: "scan-error", programId: program.id, repository, reason });
         console.error(JSON.stringify({ event: "scan-error", programId: program.id, repository, reason }));
       }
-    }
   }
 
   await mkdir("artifacts/hunt", { recursive: true });
@@ -92,6 +98,15 @@ async function main(): Promise<void> {
     scannedRepositories,
     rateLimited,
     skippedRepositories,
+    scopeReviewRequired,
+    targetPlan: targets.slice(0, Math.min(targets.length, 50)).map(target => ({
+      programId: target.program.id,
+      programName: target.program.name,
+      repository: target.repository,
+      ref: target.ref,
+      score: target.score,
+      reasons: target.reasons
+    })),
     candidateFindings: candidates.filter((x: any) => !x.type).length,
     payoutConfiguration,
     results: candidates
