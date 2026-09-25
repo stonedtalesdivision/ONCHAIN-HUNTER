@@ -13,21 +13,28 @@ export type EvidenceGraph = {
   file: string;
   severity: Severity;
   confidence: number;
+  categories: string[];
   nodes: EvidenceNode[];
   edges: EvidenceEdge[];
   attackPath: string[];
   reviewQuestions: string[];
+  correlationKey: string;
+  corroborationCount: number;
 };
 
 function node(id: string, kind: EvidenceNode["kind"], label: string, evidence: string[] = []): EvidenceNode {
   return { id, kind, label, evidence };
 }
 
-export function buildEvidenceGraph(analysis: StructuralFileAnalysis, fn: StructuralFunction, finding: Opportunity): EvidenceGraph {
+function graphForFunction(analysis: StructuralFileAnalysis, fn: StructuralFunction, findings: Opportunity[]): EvidenceGraph {
+  const primary = findings[0];
+  const categories = [...new Set(findings.map(f => f.category))];
   const nodes: EvidenceNode[] = [];
   const edges: EvidenceEdge[] = [];
   const add = (n: EvidenceNode) => { if (!nodes.some(x => x.id === n.id)) nodes.push(n); };
-  const edge = (from: string, to: string, relation: string, evidence: string[] = []) => edges.push({ from, to, relation, evidence });
+  const edge = (from: string, to: string, relation: string, evidence: string[] = []) => {
+    if (!edges.some(e => e.from === from && e.to === to && e.relation === relation)) edges.push({ from, to, relation, evidence });
+  };
 
   const f = `function:${fn.name}:${fn.startLine}`;
   add(node(f, "function", fn.name, [`lines ${fn.startLine}-${fn.endLine}`, `visibility=${fn.visibility}`, `mutability=${fn.mutability}`]));
@@ -69,14 +76,13 @@ export function buildEvidenceGraph(analysis: StructuralFileAnalysis, fn: Structu
   }
 
   const operationIds = nodes.filter(n => n.kind === "operation" || n.kind === "asset" || n.kind === "state").map(n => n.id);
-  for (const id of operationIds) {
-    edge(auth, id, "authorization-gates", [fn.accessControlled ? "authorization detected" : "authorization not detected"]);
-  }
+  for (const id of operationIds) edge(auth, id, "authorization-gates", [fn.accessControlled ? "authorization detected" : "authorization not detected"]);
 
   const attackPath = [
     ...fn.userControlledInputs.map(x => `attacker-controlled input: ${x}`),
     `reachable function: ${fn.name}`,
     fn.accessControlled ? "authorization guard detected" : "authorization guard not detected",
+    ...fn.oracleReads.map(x => `oracle influence: ${x}`),
     ...fn.externalCalls.map(x => `external call: ${x}`),
     ...fn.delegateCalls.map(x => `delegatecall: ${x}`),
     ...fn.stateWrites.map(x => `state impact: ${x}`),
@@ -85,17 +91,71 @@ export function buildEvidenceGraph(analysis: StructuralFileAnalysis, fn: Structu
   ];
 
   return {
-    findingId: finding.id,
+    findingId: primary.id,
     file: analysis.file,
-    severity: finding.severity,
-    confidence: finding.confidence,
+    severity: findings.some(f => f.severity === "critical") ? "critical" : findings.some(f => f.severity === "high") ? "high" : primary.severity,
+    confidence: Math.min(0.99, Math.max(...findings.map(f => f.confidence)) + (findings.length > 1 ? 0.04 : 0)),
+    categories,
     nodes, edges, attackPath,
     reviewQuestions: [
       "Can the attacker control the identified input or target?",
       "Is authorization inherited, indirect, or enforced outside this function?",
+      "Do multiple detector signals describe the same underlying execution path?",
       "Can the operation change privileged state or move assets?",
       "Is the affected code in the exact bounty scope and revision?",
       "Can the suspected impact be reproduced in an isolated local test?"
-    ]
+    ],
+    correlationKey: `${analysis.file}:${fn.name}:${fn.startLine}`,
+    corroborationCount: findings.length
   };
+}
+
+export function buildEvidenceGraph(analysis: StructuralFileAnalysis, fn: StructuralFunction, finding: Opportunity): EvidenceGraph {
+  return graphForFunction(analysis, fn, [finding]);
+}
+
+export function buildCorrelatedEvidenceGraphs(analysis: StructuralFileAnalysis, findings: Opportunity[]): EvidenceGraph[] {
+  const groups = new Map<string, Opportunity[]>();
+  for (const finding of findings) {
+    const fn = analysis.functions.find(x => finding.evidence.some(e => e.includes(`function ${x.name} `)) || finding.title.includes(x.name));
+    if (!fn) continue;
+    const key = `${analysis.file}:${fn.name}:${fn.startLine}`;
+    const list = groups.get(key) ?? [];
+    list.push(finding);
+    groups.set(key, list);
+  }
+  return [...groups.values()].map(group => {
+    const fn = analysis.functions.find(x => group.some(f => f.evidence.some(e => e.includes(`function ${x.name} `)) || f.title.includes(x.name)))!;
+    return graphForFunction(analysis, fn, group);
+  });
+}
+
+export function deduplicateFindings(findings: Opportunity[]): Opportunity[] {
+  const groups = new Map<string, Opportunity[]>();
+  for (const finding of findings) {
+    const key = [
+      finding.repository ?? "",
+      finding.sourceRevision ?? "",
+      finding.category,
+      finding.title.replace(/^Potential |^Critical /, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()
+    ].join("|");
+    const list = groups.get(key) ?? [];
+    list.push(finding);
+    groups.set(key, list);
+  }
+  return [...groups.values()].map(group => {
+    const primary = group.reduce((best, x) => x.confidence > best.confidence ? x : best);
+    const corroborated = [...new Set(group.flatMap(x => x.evidence))];
+    return {
+      ...primary,
+      id: primary.id,
+      confidence: Math.min(0.99, Math.max(...group.map(x => x.confidence)) + Math.min(0.08, (group.length - 1) * 0.02)),
+      evidence: [...corroborated, `corroborated detector signals: ${group.length}`]
+    };
+  });
+}
+
+export function buildAttackChains(analysis: StructuralFileAnalysis, findings: Opportunity[]): EvidenceGraph[] {
+  const relevant = findings.filter(f => f.repository || f.sourceRevision);
+  return buildCorrelatedEvidenceGraphs(analysis, relevant);
 }
