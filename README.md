@@ -98,3 +98,15 @@ Phase 8 adds persistent change detection to the autonomous hunt cycle. Each succ
 - `GET /api/status` now includes monitoring data.
 - Changed repository refs and finding revisions are surfaced for follow-up scanning/review.
 - Monitoring is detection-only: it does not exploit live systems or submit bounty reports automatically.
+
+
+## Phase 9 — Investigation Orchestration
+
+Phase 9 turns evidence packages into persistent investigation records for human review. Each finding receives a deterministic fingerprint, related functions/files, validation requirements, missing-evidence checks, revision-change detection and an investigation priority.
+
+- `artifacts/investigations/state.json` stores investigation lifecycle state.
+- `artifacts/investigations/latest.json` contains the prioritized investigation queue.
+- `GET /api/investigations` exposes the current investigation queue.
+- A finding that appears on a new source revision is explicitly marked for revalidation.
+- Review reports incorporate investigation priority and missing-evidence information.
+- Phase 9 does not execute live exploits or submit bounty reports automatically.
