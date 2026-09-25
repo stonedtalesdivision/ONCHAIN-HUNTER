@@ -26,19 +26,22 @@ export async function loadMonitoringState(): Promise<MonitoringState | null> {
   }
 }
 
-export function prioritizeChangedTargets<T extends { programId: string; repository: string }>(targets: T[], previous: MonitoringState | null): T[] {
+export function prioritizeChangedTargets<T extends { programId: string; repository: string; ref?: string; score?: number }>(
+  targets: T[],
+  previous: MonitoringState | null
+): T[] {
   if (!previous) return targets;
-  const changed = new Set<string>();
-  for (const [key, target] of Object.entries(previous.targets)) {
-    if (target) changed.add(key);
-  }
-  const current = new Set(Object.keys(previous.targets));
   return [...targets].sort((a, b) => {
-    const aKey = `${a.programId}:${a.repository}`;
-    const bKey = `${b.programId}:${b.repository}`;
-    const aChanged = !current.has(aKey) || changed.has(aKey) ? 1 : 0;
-    const bChanged = !current.has(bKey) || changed.has(bKey) ? 1 : 0;
-    return bChanged - aChanged;
+    const rank = (target: T) => {
+      const key = `${target.programId}:${target.repository}`;
+      const old = previous.targets[key];
+      if (!old) return 3;
+      if (old.ref !== target.ref || old.score !== target.score) return 2;
+      const oldProgram = previous.programs[target.programId];
+      if (oldProgram && oldProgram.sourceRepos.includes(target.repository)) return 0;
+      return 1;
+    };
+    return rank(b) - rank(a);
   });
 }
 
