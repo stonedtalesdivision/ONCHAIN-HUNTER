@@ -17,6 +17,7 @@ const investigationArtifact = join(root, "artifacts", "investigations", "latest.
 const orchestrationArtifact = join(root, "artifacts", "investigations", "orchestration.json");
 const validationArtifactDir = join(root, "artifacts", "validation-bundles");
 const workstationArtifact = join(root, "artifacts", "hunt", "research-workstation.json");
+const exploitabilityGateArtifact = join(root, "artifacts", "hunt", "exploitability-gate.json");
 const page = join(root, "dashboard", "index.html");
 let active: ChildProcess | null = null;
 let lastStartedAt: string | null = null;
@@ -107,6 +108,11 @@ createServer(async (req, res) => {
     }
     if (req.method === "GET" && req.url === "/api/production-readiness") {
       return json(res, 200, await buildProductionReadiness(root));
+    }
+    if (req.method === "GET" && req.url === "/api/exploitability-gate") {
+      let gate: unknown = { schemaVersion: "phase-15-gate", inputPackages: 0, validationCandidates: 0, reviewCandidates: 0, deprioritized: 0, assessments: [] };
+      try { gate = JSON.parse(await readFile(exploitabilityGateArtifact, "utf8")); } catch {}
+      return json(res, 200, gate);
     }
     if (req.method === "GET" && req.url === "/api/research-workstation") {
       let workstation: unknown = { schemaVersion: "phase-14", humanReviewOnly: true, submissionEnabled: false, summary: { total: 0, blocked: 0, readyForReview: 0 }, items: [], reviewQueue: [] };
