@@ -16,6 +16,7 @@ export type MonitoringEvent = {
 };
 
 const statePath = "artifacts/monitoring/state.json";
+const eventsPath = "artifacts/monitoring/latest-events.json";
 
 export async function loadMonitoringState(): Promise<MonitoringState | null> {
   try {
@@ -23,6 +24,22 @@ export async function loadMonitoringState(): Promise<MonitoringState | null> {
   } catch {
     return null;
   }
+}
+
+export function prioritizeChangedTargets<T extends { programId: string; repository: string }>(targets: T[], previous: MonitoringState | null): T[] {
+  if (!previous) return targets;
+  const changed = new Set<string>();
+  for (const [key, target] of Object.entries(previous.targets)) {
+    if (target) changed.add(key);
+  }
+  const current = new Set(Object.keys(previous.targets));
+  return [...targets].sort((a, b) => {
+    const aKey = `${a.programId}:${a.repository}`;
+    const bKey = `${b.programId}:${b.repository}`;
+    const aChanged = !current.has(aKey) || changed.has(aKey) ? 1 : 0;
+    const bChanged = !current.has(bKey) || changed.has(bKey) ? 1 : 0;
+    return bChanged - aChanged;
+  });
 }
 
 export async function updateMonitoringState(
@@ -72,7 +89,7 @@ export async function updateMonitoringState(
   await mkdir("artifacts/monitoring", { recursive: true });
   await writeFile(statePath, JSON.stringify(current, null, 2), "utf8");
   await writeFile(
-    "artifacts/monitoring/latest-events.json",
+    eventsPath,
     JSON.stringify({ schemaVersion: "phase-8", generatedAt: now, events }, null, 2),
     "utf8"
   );
