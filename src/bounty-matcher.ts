@@ -21,8 +21,9 @@ export function matchEvidencePackage(pkg:EvidencePackage,programs:BountyProgram[
   else reasons.push("Impact eligibility requires program-page review.");
   if(severity==="matched")reasons.push("Finding severity is compatible with catalog security scope signals.");
   else reasons.push("Severity/impact limits require program-page review.");
-  const eligibility=exact?"review-required":"scope-mismatch";
-  return {programId:p.id,programName:p.name,programUrl:p.url,repository:repo||null,scope:exact?"exact-repository":repo?"repository-not-listed":"unknown",impact,severity,payoutRoutes:payout(p),requirements:{pocRequired:requirements?.pocRequired??"unknown",kycRequired:requirements?.kycRequired??"unknown",prohibitedActivities:requirements?.prohibitedActivities??[],impactCategories:requirements?.impactCategories??[],knownIssueNotes:requirements?.knownIssueNotes??[],sourceUrl:requirements?.sourceUrl??p.url},eligibility, reasons};
+  const scope:BountyMatch["scope"]=exact?"exact-repository":repo?"repository-not-listed":"unknown";
+  const eligibility:BountyMatch["eligibility"]=exact?"review-required":"scope-mismatch";
+  return {programId:p.id,programName:p.name,programUrl:p.url,repository:repo||null,scope,impact,severity,payoutRoutes:payout(p),requirements:{pocRequired:requirements?.pocRequired??"unknown",kycRequired:requirements?.kycRequired??"unknown",prohibitedActivities:requirements?.prohibitedActivities??[],impactCategories:requirements?.impactCategories??[],knownIssueNotes:requirements?.knownIssueNotes??[],sourceUrl:requirements?.sourceUrl??p.url},eligibility,reasons};
  }).filter(m=>m.scope==="exact-repository"||m.impact==="matched");
 }
 
