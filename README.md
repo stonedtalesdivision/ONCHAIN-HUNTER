@@ -185,3 +185,15 @@ Human review / responsible disclosure
 ```
 
 **Release status:** final production product. Future work is optional enhancement, not a prerequisite phase.
+
+
+## Phase 15 — Signal-to-Finding Exploitability Gate
+
+The final production pipeline now separates static signals from actionable research candidates before bounty matching, proof generation and local validation.
+
+- `src/exploitability-gate.ts` evaluates reachability, attacker control, authorization risk, concrete impact, exploit-path completeness, revision/evidence depth and corroboration.
+- `artifacts/hunt/exploitability-gate.json` records every assessment and its reason/blocker set.
+- `GET /api/exploitability-gate` exposes the latest gate results.
+- Only `review` and `validation` candidates proceed to the downstream investigation, bounty-intelligence, proof and validation workflow.
+- Weak static signals remain recorded in the hunt evidence but are deprioritized instead of consuming the review/validation queue.
+- `validation` requires a high/critical candidate with a concrete impact, attacker-controlled path and complete multi-step exploit representation. This is a prioritization gate, not an automatic vulnerability verdict.
