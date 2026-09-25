@@ -123,3 +123,24 @@ Artifacts: `artifacts/validation-bundles/*.proof.json`. API: `GET /api/proof`.
 Phase 12 prepares an isolated Foundry validation harness for each evidence package and records the proof dossier alongside it. Execution remains disabled by default and is limited to explicitly authorized local environments. No live-network traffic or automatic bounty submission is performed.
 
 Artifacts: `artifacts/validation-bundles/` and `test/onchain-hunter/`. API: `GET /api/validation-bundles`.
+
+
+## Phase 13 — Advanced Bounty Intelligence
+
+Phase 13 adds a deterministic intelligence layer for comparing bounty-program signals without treating an intelligence score as bounty eligibility. It combines reward, exact repository scope, impact/severity signals, freshness and program requirements into a research-priority view.
+
+- `artifacts/hunt/bounty-intelligence.json` stores the ranked intelligence records.
+- `GET /api/bounty-intelligence` exposes the latest intelligence artifact.
+- Unknown PoC/KYC and other unresolved requirements remain explicit review risks.
+- Program-page scope, impact, known issues, payout and disclosure rules still require human verification.
+
+## Phase 14 — Research & Disclosure Workstation
+
+Phase 14 consolidates investigation state, proof dossiers, local validation preparation and bounty intelligence into one human-review workstation. It is a research queue, not an autonomous submission system.
+
+- `artifacts/hunt/research-workstation.json` stores prioritized review items, blockers and next actions.
+- `GET /api/research-workstation` exposes the workstation artifact.
+- Each item links its finding, source revision, investigation priority, proof score, validation state and evidence completeness signals.
+- Blockers and revalidation requirements are surfaced before a report can be considered ready for human review.
+- `submissionEnabled` remains permanently `false`; no bounty report or transaction is submitted automatically.
+- `npm run research:workstation` can regenerate the workstation from existing hunt artifacts.
