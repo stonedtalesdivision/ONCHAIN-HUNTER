@@ -6,6 +6,7 @@ import { scanSoliditySource } from "../scanner.js";
 import { writeFile, mkdir } from "node:fs/promises";
 import { payoutRoutesForProgram } from "../payout.js";
 import { prioritizeScanTargets } from "../target-prioritizer.js";
+import { analyzeSolidityStructure, structuralFindings } from "../structural-analysis.js";
 
 async function main(): Promise<void> {
   const hasToken = Boolean(process.env.GITHUB_TOKEN);
@@ -55,10 +56,14 @@ async function main(): Promise<void> {
         const solidity = files.filter(f => /\.(sol|vy)$/i.test(f.path));
         let repoFindings = 0;
 
+        const structuralFiles: unknown[] = [];
         for (const file of solidity) {
           if (!file.download_url) continue;
           const sourceText = await fetchRawFile(file.download_url, token);
-          for (const finding of scanSoliditySource(sourceText, file.path)) {
+          const structure = analyzeSolidityStructure(sourceText, file.path);
+          structuralFiles.push(structure);
+
+          for (const finding of [...scanSoliditySource(sourceText, file.path), ...structuralFindings(structure)]) {
             repoFindings++;
             candidates.push({
               ...finding,
@@ -109,6 +114,7 @@ async function main(): Promise<void> {
     })),
     candidateFindings: candidates.filter((x: any) => !x.type).length,
     payoutConfiguration,
+    structuralAnalysis: candidates.length ? "Function/state/call structure is collected for every scanned Solidity/Vyper source file; structural findings remain review candidates until validated." : "No scanned structural data.",
     results: candidates
   };
   await writeFile(path, JSON.stringify(result, null, 2), "utf8");
