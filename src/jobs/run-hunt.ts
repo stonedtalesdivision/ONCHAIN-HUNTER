@@ -12,7 +12,7 @@ import { detectBrokenAccessControl } from "../detectors/access-control.js";
 import { detectPhase3 } from "../detectors/phase3.js";
 import { buildCorrelatedEvidenceGraphs, buildEvidencePackages, deduplicateFindings, mergeEvidenceGraphs, rankEvidenceGraphs, linkCrossFunctionGraphs, type EvidenceGraph, type EvidencePackage } from "../evidence-graph.js";
 import type { Opportunity } from "../types.js";
-import { updateMonitoringState } from "../monitoring.js";
+import { loadMonitoringState, prioritizeChangedTargets, updateMonitoringState } from "../monitoring.js";
 
 async function main(): Promise<void> {
  const hasToken=Boolean(process.env.GITHUB_TOKEN),configuredLimit=Number(process.env.ONCHAIN_HUNTER_LIMIT??(hasToken?"5":"1")),limit=Math.max(1,Math.min(Number.isFinite(configuredLimit)?configuredLimit:1,20)),token=process.env.GITHUB_TOKEN,source=new ImmunefiBountySource();
@@ -21,8 +21,8 @@ async function main(): Promise<void> {
  const candidates:unknown[]=[],structuralSummaries:unknown[]=[],evidenceGraphs:EvidenceGraph[]=[];
  const payoutConfiguration=programs.filter(p=>p.status==="active").map(program=>({programId:program.id,programName:program.name,routes:payoutRoutesForProgram(program)}));
  let scannedRepositories=0,skippedRepositories=0,attemptedRepositories=0,rateLimited=false;
- const activePrograms=programs.filter(p=>p.status==="active"),allRepositoryCount=activePrograms.reduce((t,p)=>t+p.sourceRepos.length,0),targets=prioritizeScanTargets(activePrograms),scopeReviewRequired=Math.max(0,allRepositoryCount-targets.length),selectedTargets=targets.slice(0,limit);
- console.log(JSON.stringify({event:"targets-prioritized",activePrograms:activePrograms.length,repositoriesAvailable:allRepositoryCount,exactScopeTargets:targets.length,scopeReviewRequired,selected:selectedTargets.map(t=>({programId:t.program.id,repository:t.repository,ref:t.ref,score:t.score}))}));
+ const activePrograms=programs.filter(p=>p.status==="active"),allRepositoryCount=activePrograms.reduce((t,p)=>t+p.sourceRepos.length,0),targets=prioritizeScanTargets(activePrograms),previousMonitoring=await loadMonitoringState(),monitoringTargets=prioritizeChangedTargets(targets.map(t=>({programId:t.program.id,repository:t.repository,ref:t.ref,score:t.score,target:t})),previousMonitoring).map(t=>t.target),scopeReviewRequired=Math.max(0,allRepositoryCount-targets.length),selectedTargets=monitoringTargets.slice(0,limit);
+ console.log(JSON.stringify({event:"targets-prioritized",monitoringBaseline:Boolean(previousMonitoring),activePrograms:activePrograms.length,repositoriesAvailable:allRepositoryCount,exactScopeTargets:targets.length,scopeReviewRequired,selected:selectedTargets.map(t=>({programId:t.program.id,repository:t.repository,ref:t.ref,score:t.score}))}));
  for(const target of selectedTargets){const {program,repository,ref}=target;attemptedRepositories++;console.log(JSON.stringify({event:"scan-start",programId:program.id,repository,ref,priorityScore:target.score,priorityReasons:target.reasons}));
   try{const revision=await resolveRepositoryRevision(repository,ref,token),files=await listRepositoryFiles(repository,token,ref),solidity=files.filter(f=>/\.sol$/i.test(f.path));let repoFindings=0;
    for(const file of solidity){if(!file.download_url)continue;const sourceText=await fetchRawFile(file.download_url,token),structure=analyzeSolidityStructure(sourceText,file.path);structuralSummaries.push(structure);
