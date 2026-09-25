@@ -1,26 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { analyzeSolidityStructure } from "../dist/structural-analysis.js";
-import { buildCorrelatedEvidenceGraphs, deduplicateFindings } from "../dist/evidence-graph.js";
-
-function finding(category, title, confidence=.7) {
-  return { id: category+"-1", programId:"p", title, category, severity:"high", confidence, evidence:["function withdraw (external, nonpayable) lines 1-1"], status:"new", createdAt:new Date().toISOString(), repository:"r", sourceRevision:"sha" };
-}
-
-test("correlates multiple detector signals into one graph", () => {
-  const analysis = analyzeSolidityStructure(`contract Vault { uint balance; function withdraw(address recipient, uint amount) external { recipient.call{value: amount}(""); balance -= amount; } }`, "Vault.sol");
-  const graphs = buildCorrelatedEvidenceGraphs(analysis, [finding("external-call","Potential arbitrary external call path: withdraw"), finding("reentrancy","Potential reentrancy with state impact: withdraw")]);
-  assert.equal(graphs.length, 1);
-  assert.equal(graphs[0].corroborationCount, 2);
-  assert.ok(graphs[0].categories.includes("external-call"));
-  assert.ok(graphs[0].categories.includes("reentrancy"));
-});
-
-test("deduplicates repeated detector findings", () => {
-  const a=finding("access-control","Potential broken access control on privileged operation: withdraw",.7);
-  const b={...a,id:"duplicate",confidence:.8,evidence:["second detector signal"]};
-  const result=deduplicateFindings([a,b]);
-  assert.equal(result.length,1);
-  assert.ok(result[0].confidence > .8);
-  assert.match(result[0].evidence.join(" "),/corroborated/);
-});
+import { buildCorrelatedEvidenceGraphs, buildEvidencePackages, deduplicateFindings, linkCrossFunctionGraphs } from "../dist/evidence-graph.js";
+function finding(category,title,confidence=.7){return{id:category+"-1",programId:"p",title,category,severity:"high",confidence,evidence:["function withdraw (external, nonpayable) lines 1-1"],status:"new",createdAt:new Date().toISOString(),repository:"r",sourceRevision:"sha"};}
+test("correlates multiple detector signals into one graph",()=>{const a=analyzeSolidityStructure(`contract Vault { uint balance; function withdraw(address recipient, uint amount) external { recipient.call{value: amount}(""); balance -= amount; } }`,"Vault.sol");const g=buildCorrelatedEvidenceGraphs(a,[finding("external-call","Potential arbitrary external call path: withdraw"),finding("reentrancy","Potential reentrancy with state impact: withdraw")]);assert.equal(g.length,1);assert.equal(g[0].corroborationCount,2);assert.ok(g[0].categories.includes("external-call"));assert.ok(g[0].categories.includes("reentrancy"));});
+test("deduplicates repeated detector findings",()=>{const a=finding("access-control","Potential broken access control on privileged operation: withdraw",.7),b={...a,id:"duplicate",confidence:.8,evidence:["second detector signal"]},r=deduplicateFindings([a,b]);assert.equal(r.length,1);assert.ok(r[0].confidence>.8);assert.match(r[0].evidence.join(" "),/corroborated/);});
+test("builds transaction sequence and evidence package",()=>{const a=analyzeSolidityStructure(`contract Vault { uint balance; function withdraw(address recipient,uint amount) external { _beforeWithdraw(amount); recipient.call{value:amount}(""); balance -= amount; } function _beforeWithdraw(uint amount) internal { balance += amount; } }`,"Vault.sol");const fs=[finding("external-call","Potential arbitrary external call path: withdraw")],gs=buildCorrelatedEvidenceGraphs(a,fs),pk=buildEvidencePackages(gs,fs);assert.ok(gs[0].transactionSequence.some(s=>s.role==="internal-call"&&s.function==="_beforeWithdraw"));assert.equal(pk.length,1);assert.equal(pk[0].submissionReady,false);assert.ok(pk[0].validationPlan.length>=3);});
+test("links graphs through shared state",()=>{const a=analyzeSolidityStructure(`contract Vault { uint balance; function withdraw(address recipient,uint amount) external { recipient.call{value:amount}(""); balance -= amount; } function sweep(address to,uint amount) external { to.call{value:amount}(""); balance -= amount; } }`,"Vault.sol");const fs=[finding("external-call","Potential arbitrary external call path: withdraw"),{...finding("external-call","Potential arbitrary external call path: sweep"),id:"x",evidence:["function sweep (external, nonpayable) lines 1-1"]}];const gs=linkCrossFunctionGraphs(buildCorrelatedEvidenceGraphs(a,fs));assert.ok(gs.some(g=>g.crossFunctionPaths.length>0));});
