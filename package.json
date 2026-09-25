@@ -26,7 +26,8 @@
     "investigate:orchestrate": "tsx src/investigation-orchestrator.ts",
     "proof:generate": "tsx src/proof-engine.ts",
     "validation:prepare": "tsx src/validation-orchestrator.ts",
-    "bounty:intelligence": "tsx src/bounty-intelligence.ts"
+    "bounty:intelligence": "tsx src/bounty-intelligence.ts",
+    "research:workstation": "tsx src/research-workstation.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.2",
