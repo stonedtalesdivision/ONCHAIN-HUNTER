@@ -144,3 +144,44 @@ Phase 14 consolidates investigation state, proof dossiers, local validation prep
 - Blockers and revalidation requirements are surfaced before a report can be considered ready for human review.
 - `submissionEnabled` remains permanently `false`; no bounty report or transaction is submitted automatically.
 - `npm run research:workstation` can regenerate the workstation from existing hunt artifacts.
+
+
+## Phase 15 — Final Production Release
+
+Phase 15 is the final product-hardening phase. ONCHAIN-HUNTER is released as a production autonomous security-research platform with a complete discovery → scoped scan → evidence → investigation → proof → local validation → bounty intelligence → human-review workstation workflow.
+
+- `artifacts/hunt/production-readiness.json` records final production checks.
+- `GET /api/production-readiness` exposes the live readiness report.
+- `GET /api/status` includes the readiness report.
+- `npm run production:readiness` regenerates the final readiness report and fails when a required production artifact or safety contract is broken.
+- The production release is explicitly human-review-only: live execution is disabled and automatic bounty submission is disabled.
+- The existing Nginx HTTPS + Basic Auth deployment, PM2 service, health check and GitHub Actions deployment remain the production operating model.
+- No private keys, seed phrases or signing credentials are required by the product.
+
+### Final operating workflow
+
+```text
+Public bounty discovery
+        ↓
+Exact authorized repository scope
+        ↓
+Target prioritization + monitoring
+        ↓
+Static Solidity/EVM analysis
+        ↓
+Correlated evidence graph
+        ↓
+Investigation + revision tracking
+        ↓
+Proof dossier
+        ↓
+Local validation bundle
+        ↓
+Bounty intelligence
+        ↓
+Research & disclosure workstation
+        ↓
+Human review / responsible disclosure
+```
+
+**Release status:** final production product. Future work is optional enhancement, not a prerequisite phase.
