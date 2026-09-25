@@ -1,0 +1,5 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { buildProofDossier } from "../dist/proof-engine.js";
+const pkg={packageId:"pkg-1",findingId:"finding-1",title:"candidate",file:"Vault.sol",severity:"high",confidence:.9,categories:["access-control"],impact:"asset-loss",exploitability:"direct",scopeConfidence:"exact-revision",attackPath:["attacker input","withdraw","asset impact"],transactionSequence:[{order:1,function:"withdraw",role:"entry",evidence:"entry"},{order:2,function:"withdraw",role:"asset-impact",evidence:"transfer"},{order:3,function:"withdraw",role:"shared-state",evidence:"state write"}],corroborationCount:2,evidence:["program","repository","revision"],reviewQuestions:[],validationPlan:["local test"],repository:"org/repo",sourceRevision:"abc",submissionReady:false};
+test("phase 11 builds a proof dossier without claiming exploitability",()=>{const d=buildProofDossier(pkg);assert.equal(d.schemaVersion,"phase-11");assert.equal(d.humanReviewRequired,true);assert.ok(d.proofScore>=70);assert.ok(d.claims.length>=4);});
