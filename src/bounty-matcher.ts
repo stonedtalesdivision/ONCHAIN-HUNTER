@@ -5,13 +5,13 @@ import type {PayoutRoute} from "./payout.js";
 export type BountyMatch={programId:string;programName:string;programUrl:string;repository:string|null;scope:"exact-repository"|"repository-not-listed"|"unknown";impact:"matched"|"unverified";severity:"matched"|"unverified";payoutRoutes:PayoutRoute[];requirements:{pocRequired:boolean|"unknown";kycRequired:boolean|"unknown";prohibitedActivities:string[];impactCategories:string[];knownIssueNotes:string[];sourceUrl:string|null};eligibility:"review-required"|"scope-mismatch"|"candidate";reasons:string[]};
 
 function severityMatches(program:BountyProgram,severity:Severity){const text=[...program.inScope,...program.chains].join(" ").toLowerCase();if(!text)return "unverified" as const;const high=severity==="critical"||severity==="high";if(high&&/(critical|high|severity|smart contract|code)/.test(text))return "matched" as const;return "unverified" as const}
-function impactMatches(program:BountyProgram,category:string){const req=program.requirements?.impactCategories??[];if(!req.length)return "unverified" as const;const c=category.toLowerCase();return req.some(x=>x.toLowerCase().includes(c)||c.includes(x.toLowerCase()))?"matched":"unverified"}
+function impactMatches(program:BountyProgram,category:string):"matched"|"unverified"{const req=program.requirements?.impactCategories??[];if(!req.length)return "unverified" as const;const c=category.toLowerCase();return req.some(x=>x.toLowerCase().includes(c)||c.includes(x.toLowerCase()))?"matched":"unverified"}
 
 export function matchEvidencePackage(pkg:EvidencePackage,programs:BountyProgram[],payout:(p:BountyProgram)=>PayoutRoute[]):BountyMatch[]{
  const repo=pkg.repository??"";
  return programs.filter(p=>p.status==="active").map(p=>{
   const exact=p.sourceRepos.some(r=>r.toLowerCase()===repo.toLowerCase());
-  const impact=impactMatches(p,pkg.categories[0]??"");
+  const impact:BountyMatch["impact"]=impactMatches(p,pkg.categories[0]??"");
   const severity=severityMatches(p,pkg.severity);
   const requirements=p.requirements;
   const reasons:string[]=[];
