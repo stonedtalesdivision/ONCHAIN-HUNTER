@@ -20,7 +20,8 @@
     "hunt": "tsx src/jobs/run-hunt.ts",
     "dashboard": "tsx src/dashboard.ts",
     "autonomous": "tsx src/autonomous.ts",
-    "validate:suite": "tsx src/jobs/prepare-validation-suite.ts"
+    "validate:suite": "tsx src/jobs/prepare-validation-suite.ts",
+    "bounty:match": "tsx src/jobs/run-bounty-matching.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.2",
