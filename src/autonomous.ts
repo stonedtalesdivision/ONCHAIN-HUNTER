@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { createServer } from "node:http";
-import { readFile, mkdir } from "node:fs/promises";
+import { readFile, mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { spawn, type ChildProcess } from "node:child_process";
 import { readLedger, upsertLedgerEntry, type BountyLedgerEntry } from "./ledger.js";
@@ -71,6 +71,33 @@ async function runHunt(): Promise<boolean> {
   return true;
 }
 
+const resetPaths = [
+  artifact,
+  reviewQueueArtifact,
+  monitoringArtifact,
+  join(root, "artifacts", "monitoring", "state.json"),
+  investigationArtifact,
+  join(root, "artifacts", "investigations", "state.json"),
+  orchestrationArtifact,
+  join(root, "artifacts", "hunt", "bounty-intelligence.json"),
+  workstationArtifact,
+  exploitabilityGateArtifact,
+  join(root, "artifacts", "reports"),
+  validationArtifactDir
+];
+
+async function resetHuntData(): Promise<{ cleared: string[] }> {
+  if (active) throw new Error("Cannot reset while a hunt is running. Wait for the current hunt to finish.");
+  for (const target of resetPaths) await rm(target, { recursive: true, force: true });
+  await mkdir(join(root, "artifacts", "hunt"), { recursive: true });
+  await mkdir(join(root, "artifacts", "monitoring"), { recursive: true });
+  await mkdir(join(root, "artifacts", "investigations"), { recursive: true });
+  await mkdir(validationArtifactDir, { recursive: true });
+  lastExitCode = 0;
+  lastError = null;
+  return { cleared: resetPaths.map(path => path.replace(root + "/", "")) };
+}
+
 function json(res: import("node:http").ServerResponse, status: number, value: unknown) {
   res.writeHead(status, { "content-type": "application/json", "cache-control": "no-store" });
   res.end(JSON.stringify(value));
@@ -85,6 +112,18 @@ async function readJsonBody(req: import("node:http").IncomingMessage): Promise<u
 
 createServer(async (req, res) => {
   try {
+    if (req.method === "POST" && req.url === "/api/reset") {
+      let body: Record<string, unknown> = {};
+      try { body = await readJsonBody(req) as Record<string, unknown>; } catch {}
+      if (body.confirm !== "RESET") return json(res, 400, { error: "Confirmation required: send {"confirm":"RESET"}" });
+      try {
+        const result = await resetHuntData();
+        return json(res, 200, { reset: true, ...result });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return json(res, message.includes("while a hunt is running") ? 409 : 500, { reset: false, error: message });
+      }
+    }
     if (req.method === "POST" && req.url === "/api/hunt") {
       const started = await runHunt();
       return json(res, started ? 202 : 409, {
