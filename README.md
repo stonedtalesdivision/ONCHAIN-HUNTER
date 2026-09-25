@@ -197,3 +197,8 @@ The final production pipeline now separates static signals from actionable resea
 - Only `review` and `validation` candidates proceed to the downstream investigation, bounty-intelligence, proof and validation workflow.
 - Weak static signals remain recorded in the hunt evidence but are deprioritized instead of consuming the review/validation queue.
 - `validation` requires a high/critical candidate with a concrete impact, attacker-controlled path and complete multi-step exploit representation. This is a prioritization gate, not an automatic vulnerability verdict.
+
+
+### Dashboard Hunt Data Reset
+
+Use the dashboard **RESET DATA** control before a clean production shakedown. It requires explicit `RESET` confirmation and refuses to run while a hunt is active. It clears generated hunt state, monitoring/investigation state, reports, validation bundles, bounty intelligence, exploitability-gate results and the research workstation. The bounty ledger, application configuration and production-readiness configuration are preserved.
