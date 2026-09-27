@@ -18,16 +18,18 @@ const orchestrationArtifact = join(root, "artifacts", "investigations", "orchest
 const validationArtifactDir = join(root, "artifacts", "validation-bundles");
 const workstationArtifact = join(root, "artifacts", "hunt", "research-workstation.json");
 const exploitabilityGateArtifact = join(root, "artifacts", "hunt", "exploitability-gate.json");
+const pauseStateArtifact = join(root, "artifacts", "hunt", "paused.json");
 const page = join(root, "dashboard", "index.html");
 let active: ChildProcess | null = null;
 let lastStartedAt: string | null = null;
 let lastExitCode: number | null = null;
 let lastError: string | null = null;
 let retryTimer: NodeJS.Timeout | null = null;
+let paused = false;
 const maxHuntRuntimeMinutes = Math.max(5, Number(process.env.HUNT_MAX_RUNTIME_MINUTES ?? 45));
 
 async function runHunt(): Promise<boolean> {
-  if (active) return false;
+  if (paused || active) return false;
   await mkdir(join(root, "artifacts", "hunt"), { recursive: true });
   lastStartedAt = new Date().toISOString();
   const job = join(root, "dist", "jobs", "run-hunt.js");
@@ -64,7 +66,7 @@ async function runHunt(): Promise<boolean> {
     }
     console.log(JSON.stringify({ event: "hunt-exit", code }));
     active = null;
-    if (code !== 0 && !retryTimer) {
+    if (code !== 0 && !retryTimer && !paused) {
       retryTimer = setTimeout(() => { retryTimer = null; void runHunt(); }, 5 * 60_000);
     }
   });
@@ -85,6 +87,32 @@ const resetPaths = [
   join(root, "artifacts", "reports"),
   validationArtifactDir
 ];
+
+async function persistPauseState(): Promise<void> {
+  await mkdir(join(root, "artifacts", "hunt"), { recursive: true });
+  await writeFile(pauseStateArtifact, JSON.stringify({ paused, updatedAt: new Date().toISOString() }, null, 2), "utf8");
+}
+
+async function stopHunting(): Promise<{ stopped: boolean; running: boolean }> {
+  paused = true;
+  if (retryTimer) {
+    clearTimeout(retryTimer);
+    retryTimer = null;
+  }
+  await persistPauseState();
+  if (active) {
+    lastError = "Hunt stopped by user";
+    active.kill("SIGTERM");
+    return { stopped: true, running: true };
+  }
+  return { stopped: true, running: false };
+}
+
+async function resumeHunting(): Promise<boolean> {
+  paused = false;
+  await persistPauseState();
+  return runHunt();
+}
 
 async function resetHuntData(): Promise<{ cleared: string[] }> {
   if (active) throw new Error("Cannot reset while a hunt is running. Wait for the current hunt to finish.");
@@ -112,26 +140,36 @@ async function readJsonBody(req: import("node:http").IncomingMessage): Promise<u
 
 createServer(async (req, res) => {
   try {
+    if (req.method === "POST" && req.url === "/api/hunt/stop") {
+      const result = await stopHunting();
+      return json(res, 202, { ...result, paused: true, message: result.running ? "Stopping active hunt" : "Hunting paused" });
+    }
+    if (req.method === "POST" && req.url === "/api/hunt/resume") {
+      const started = await resumeHunting();
+      return json(res, started ? 202 : 409, { started, running: Boolean(active), paused, lastStartedAt, lastExitCode, lastError, intervalMinutes, limit });
+    }
     if (req.method === "POST" && req.url === "/api/reset") {
       let body: Record<string, unknown> = {};
       try { body = await readJsonBody(req) as Record<string, unknown>; } catch {}
       if (body.confirm !== "RESET") return json(res, 400, { error: "Confirmation required: send RESET confirmation" });
       try {
         const result = await resetHuntData();
-        return json(res, 200, { reset: true, ...result });
+        return json(res, 200, { reset: true, ...result, paused });
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         return json(res, message.includes("while a hunt is running") ? 409 : 500, { reset: false, error: message });
       }
     }
     if (req.method === "POST" && req.url === "/api/hunt") {
+      if (paused) paused = false;
+      if (paused === false) await persistPauseState();
       const started = await runHunt();
       return json(res, started ? 202 : 409, {
         started, running: Boolean(active), lastStartedAt, lastExitCode, lastError, intervalMinutes, limit
       });
     }
     if (req.method === "GET" && req.url === "/api/health") {
-      return json(res, 200, { ok: true, running: Boolean(active), lastStartedAt, lastExitCode, lastError });
+      return json(res, 200, { ok: true, running: Boolean(active), paused, lastStartedAt, lastExitCode, lastError });
     }
     if (req.method === "GET" && req.url === "/api/review-queue") {
       let queue: unknown = { schemaVersion: "phase-7", submissionEnabled: false, totalReports: 0, reports: [] };
@@ -221,7 +259,7 @@ createServer(async (req, res) => {
       try { monitoring = JSON.parse(await readFile(monitoringArtifact, "utf8")); } catch {}
       try { orchestration = JSON.parse(await readFile(orchestrationArtifact, "utf8")); } catch {}
       try { workstation = JSON.parse(await readFile(workstationArtifact, "utf8")); } catch {}
-      return json(res, 200, { running: Boolean(active), lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt, monitoring, orchestration, workstation, productionReadiness: await buildProductionReadiness(root), ledger: await readLedger() });
+      return json(res, 200, { running: Boolean(active), paused, lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt, monitoring, orchestration, workstation, productionReadiness: await buildProductionReadiness(root), ledger: await readLedger() });
     }
     if (req.url?.startsWith("/api/hunt")) {
       let body: unknown = { programsDiscovered: 0, scannedRepositories: 0, candidateFindings: 0, skippedRepositories: 0, attemptedRepositories: 0, rateLimited: false, results: [] };
@@ -236,6 +274,12 @@ createServer(async (req, res) => {
   }
 }).listen(port, () => {
   console.log(JSON.stringify({ service: "onchain-hunter-autonomous", url: "http://localhost:" + port, intervalMinutes, limit }));
-  void runHunt();
+  void (async () => {
+    try {
+      const state = JSON.parse(await readFile(pauseStateArtifact, "utf8")) as { paused?: boolean };
+      paused = state.paused === true;
+    } catch {}
+    if (!paused) await runHunt();
+  })();
   setInterval(() => void runHunt(), intervalMinutes * 60_000);
 });
