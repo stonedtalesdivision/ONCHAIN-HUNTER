@@ -115,7 +115,7 @@ createServer(async (req, res) => {
     if (req.method === "POST" && req.url === "/api/reset") {
       let body: Record<string, unknown> = {};
       try { body = await readJsonBody(req) as Record<string, unknown>; } catch {}
-      if (body.confirm !== "RESET") return json(res, 400, { error: "Confirmation required: send {"confirm":"RESET"}" });
+      if (body.confirm !== "RESET") return json(res, 400, { error: "Confirmation required: send RESET confirmation" });
       try {
         const result = await resetHuntData();
         return json(res, 200, { reset: true, ...result });
