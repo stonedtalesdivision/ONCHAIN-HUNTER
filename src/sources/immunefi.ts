@@ -11,6 +11,17 @@ type ImmunefiRecord = {
   [key: string]: unknown;
 };
 
+function isCurrentlyActive(item: ImmunefiRecord): boolean {
+  const rawStatus = String(item.status ?? "").trim().toLowerCase();
+  if (["inactive", "finished", "ended", "closed", "expired", "archived", "complete", "completed"].includes(rawStatus)) return false;
+  const endValue = item.endDate ?? item.end_date ?? item.endsAt ?? item.ends_at ?? item.endTime ?? item.end_time;
+  if (endValue) {
+    const end = new Date(String(endValue));
+    if (Number.isFinite(end.getTime()) && end.getTime() <= Date.now()) return false;
+  }
+  return ["active", "live", "ongoing", "running", "open"].includes(rawStatus);
+}
+
 function numberOrUndefined(value: unknown): number | undefined {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value === "string") {
@@ -60,7 +71,7 @@ export class ImmunefiBountySource implements BountySource {
         name: typeof item.project === "string" ? item.project : (typeof item.slug === "string" ? item.slug : "program-" + index),
         platform: "Immunefi",
         url: typeof item.url === "string" ? item.url : (typeof item.slug === "string" ? "https://immunefi.com/bug-bounty/" + item.slug + "/" : "https://immunefi.com/bug-bounty/"),
-        status: item.status === "inactive" ? "inactive" : "active",
+        status: isCurrentlyActive(item) ? "active" : "inactive",
         maxReward: numberOrUndefined(item.maxBounty),
         rewardCurrency: typeof item.rewardToken === "string" ? item.rewardToken : undefined,
         chains: Array.isArray(item.ecosystems) ? item.ecosystems.filter((x): x is string => typeof x === "string") : [],
