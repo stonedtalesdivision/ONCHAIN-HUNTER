@@ -65,35 +65,17 @@ async function runHunt(): Promise<boolean> {
       report.stderr?.on("data", d => process.stderr.write(d));
       report.on("error", error => console.error(JSON.stringify({ event: "report-generation-error", error: error instanceof Error ? error.message : String(error) })));
     }
-    console.log(JSON.stringify({ event: "hunt-exit", code }));
+    console.log(JSON.stringify({ event: "hunt-batch-exit", code }));
     active = null;
-    if (code !== 0 && !retryTimer && !paused) {
-      retryTimer = setTimeout(() => { retryTimer = null; void runHunt(); }, 5 * 60_000);
-    } else if (code === 0 && !paused && !retryTimer) {
+    if (!paused && !retryTimer) {
       void (async () => {
-        let cycleComplete = true;
         let rateLimited = false;
         try {
-          const latest = JSON.parse(await readFile(artifact, "utf8")) as {
-            scanCursor?: { cycleComplete?: boolean };
-            rateLimited?: boolean;
-          };
-          cycleComplete = latest.scanCursor?.cycleComplete !== false;
+          const latest = JSON.parse(await readFile(artifact, "utf8")) as { rateLimited?: boolean };
           rateLimited = latest.rateLimited === true;
         } catch {}
-        const authenticated = Boolean(process.env.GITHUB_TOKEN);
-        const delay = rateLimited
-          ? intervalMinutes * 60_000
-          : cycleComplete
-            ? (authenticated ? 30_000 : 10 * 60_000)
-            : (authenticated ? 2_000 : 30_000);
-        console.log(JSON.stringify({
-          event: "hunt-next-batch",
-          cycleComplete,
-          authenticatedGitHub: authenticated,
-          rateLimited,
-          delayMs: delay
-        }));
+        const delay = rateLimited ? intervalMinutes * 60_000 : code === 0 ? 2_000 : 15_000;
+        console.log(JSON.stringify({ event: "hunt-supervisor-next-batch", code, rateLimited, delayMs: delay }));
         retryTimer = setTimeout(() => { retryTimer = null; void runHunt(); }, delay);
       })();
     }
@@ -198,7 +180,7 @@ createServer(async (req, res) => {
       });
     }
     if (req.method === "GET" && req.url === "/api/health") {
-      return json(res, 200, { ok: true, running: Boolean(active), paused, lastStartedAt, lastExitCode, lastError });
+      return json(res, 200, { ok: true, running: Boolean(active) || Boolean(retryTimer), batchRunning: Boolean(active), nextBatchScheduled: Boolean(retryTimer), paused, lastStartedAt, lastExitCode, lastError });
     }
     if (req.method === "GET" && req.url === "/api/review-queue") {
       let queue: unknown = { schemaVersion: "phase-7", submissionEnabled: false, totalReports: 0, reports: [] };
@@ -288,7 +270,7 @@ createServer(async (req, res) => {
       try { monitoring = JSON.parse(await readFile(monitoringArtifact, "utf8")); } catch {}
       try { orchestration = JSON.parse(await readFile(orchestrationArtifact, "utf8")); } catch {}
       try { workstation = JSON.parse(await readFile(workstationArtifact, "utf8")); } catch {}
-      return json(res, 200, { running: Boolean(active), paused, lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt, monitoring, orchestration, workstation, productionReadiness: await buildProductionReadiness(root), ledger: await readLedger() });
+      return json(res, 200, { running: Boolean(active) || Boolean(retryTimer), batchRunning: Boolean(active), nextBatchScheduled: Boolean(retryTimer), paused, lastStartedAt, lastExitCode, lastError, intervalMinutes, limit, hunt, monitoring, orchestration, workstation, productionReadiness: await buildProductionReadiness(root), ledger: await readLedger() });
     }
     if (req.url?.startsWith("/api/hunt")) {
       let body: unknown = { programsDiscovered: 0, scannedRepositories: 0, candidateFindings: 0, skippedRepositories: 0, attemptedRepositories: 0, rateLimited: false, results: [] };
