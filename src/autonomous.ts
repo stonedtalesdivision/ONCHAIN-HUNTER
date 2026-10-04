@@ -19,6 +19,7 @@ const validationArtifactDir = join(root, "artifacts", "validation-bundles");
 const workstationArtifact = join(root, "artifacts", "hunt", "research-workstation.json");
 const exploitabilityGateArtifact = join(root, "artifacts", "hunt", "exploitability-gate.json");
 const pauseStateArtifact = join(root, "artifacts", "hunt", "paused.json");
+const scanCursorArtifact = join(root, "artifacts", "hunt", "scan-cursor.json");
 const page = join(root, "dashboard", "index.html");
 let active: ChildProcess | null = null;
 let lastStartedAt: string | null = null;
@@ -68,6 +69,16 @@ async function runHunt(): Promise<boolean> {
     active = null;
     if (code !== 0 && !retryTimer && !paused) {
       retryTimer = setTimeout(() => { retryTimer = null; void runHunt(); }, 5 * 60_000);
+    } else if (code === 0 && !paused && !retryTimer) {
+      void (async () => {
+        let cycleComplete = true;
+        try {
+          const latest = JSON.parse(await readFile(artifact, "utf8")) as { scanCursor?: { cycleComplete?: boolean } };
+          cycleComplete = latest.scanCursor?.cycleComplete !== false;
+        } catch {}
+        const delay = cycleComplete ? intervalMinutes * 60_000 : 2_000;
+        retryTimer = setTimeout(() => { retryTimer = null; void runHunt(); }, delay);
+      })();
     }
   });
   return true;
@@ -82,6 +93,7 @@ const resetPaths = [
   join(root, "artifacts", "investigations", "state.json"),
   orchestrationArtifact,
   join(root, "artifacts", "hunt", "bounty-intelligence.json"),
+  scanCursorArtifact,
   workstationArtifact,
   exploitabilityGateArtifact,
   join(root, "artifacts", "reports"),
