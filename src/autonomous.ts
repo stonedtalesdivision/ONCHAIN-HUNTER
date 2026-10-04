@@ -72,11 +72,28 @@ async function runHunt(): Promise<boolean> {
     } else if (code === 0 && !paused && !retryTimer) {
       void (async () => {
         let cycleComplete = true;
+        let rateLimited = false;
         try {
-          const latest = JSON.parse(await readFile(artifact, "utf8")) as { scanCursor?: { cycleComplete?: boolean } };
+          const latest = JSON.parse(await readFile(artifact, "utf8")) as {
+            scanCursor?: { cycleComplete?: boolean };
+            rateLimited?: boolean;
+          };
           cycleComplete = latest.scanCursor?.cycleComplete !== false;
+          rateLimited = latest.rateLimited === true;
         } catch {}
-        const delay = cycleComplete ? intervalMinutes * 60_000 : 2_000;
+        const authenticated = Boolean(process.env.GITHUB_TOKEN);
+        const delay = rateLimited
+          ? intervalMinutes * 60_000
+          : cycleComplete
+            ? (authenticated ? 30_000 : 10 * 60_000)
+            : (authenticated ? 2_000 : 30_000);
+        console.log(JSON.stringify({
+          event: "hunt-next-batch",
+          cycleComplete,
+          authenticatedGitHub: authenticated,
+          rateLimited,
+          delayMs: delay
+        }));
         retryTimer = setTimeout(() => { retryTimer = null; void runHunt(); }, delay);
       })();
     }
