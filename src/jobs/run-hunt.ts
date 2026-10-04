@@ -31,7 +31,7 @@ async function main(): Promise<void> {
    const saved=JSON.parse(await readFile(cursorPath,"utf8")) as { nextCursor?: number };
    scanCursor=Math.max(0,Number(saved.nextCursor??0));
  } catch {}
- const hasToken=Boolean(process.env.GITHUB_TOKEN),configuredLimit=Number(process.env.ONCHAIN_HUNTER_LIMIT??(hasToken?"5":"1")),limit=Math.max(1,Math.min(Number.isFinite(configuredLimit)?configuredLimit:1,20)),token=process.env.GITHUB_TOKEN,source=new ImmunefiBountySource();
+ const hasToken=Boolean(process.env.GITHUB_TOKEN),configuredLimit=Number(process.env.ONCHAIN_HUNTER_LIMIT??(hasToken?"5":"5")),limit=Math.max(1,Math.min(Number.isFinite(configuredLimit)?configuredLimit:1,20)),token=process.env.GITHUB_TOKEN,source=new ImmunefiBountySource();
  console.log(JSON.stringify({event:"hunt-start",repositoryLimit:limit,authenticatedGitHub:hasToken}));
  const programs=await source.discover();console.log(JSON.stringify({event:"catalog-loaded",programsDiscovered:programs.length}));
  const candidates:unknown[]=[],structuralSummaries:unknown[]=[],evidenceGraphs:EvidenceGraph[]=[];
