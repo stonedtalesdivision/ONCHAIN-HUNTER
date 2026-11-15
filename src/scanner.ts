@@ -161,7 +161,7 @@ function assessContext(
 }
 
 /**
- * Compute a contextual confidence score (0–1) for a candidate.
+ * Compute a contextual confidence score (0-1) for a candidate.
  * Adjusts the raw pattern confidence based on surrounding code signals.
  */
 function contextScore(
@@ -453,7 +453,7 @@ const PATTERNS: Pattern[] = [
     category: "Arithmetic",
     severity: "high",
     confidence: 0.68,
-    regex: /[\+\-\*]\s*(?:\w+|\d+)\s*[;,)]/,
+    regex: /[+\-*]\s*(?:\w+|\d+)\s*[;,)]/,
   },
   {
     id: "unsafe-downcast",
@@ -557,7 +557,7 @@ const PATTERNS: Pattern[] = [
     category: "Token Safety",
     severity: "medium",
     confidence: 0.55,
-    regex: /\.approve\s*\(\s*[^,]+,\s*(?!0\s*[,)]))([\w.]+/,
+    regex: /\.approve\s*\(\s*[^,]+,\s*(?!0\s*[,)])\w/,
   },
 ];
 
