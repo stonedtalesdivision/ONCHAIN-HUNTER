@@ -5,21 +5,36 @@ const ENDPOINT = "https://immunefi.com/public-api/bounties.json";
 
 type ImmunefiRecord = {
   project?: string; slug?: string; url?: string; status?: string;
-  maxBounty?: number | string; rewardToken?: string; ecosystems?: string[];
+  isPaused?: boolean; pausedAt?: string;
+  endDate?: string; launchDate?: string;
+  maxBounty?: number | string; rewardsToken?: string;
+  ecosystem?: string[]; ecosystems?: string[];
   assetsInScope?: unknown;
+  assets?: unknown;
   resources?: unknown;
+  githubUrl?: string | null;
+  websiteUrl?: string | null;
   [key: string]: unknown;
 };
 
 function isCurrentlyActive(item: ImmunefiRecord): boolean {
+  // If explicitly paused, it's inactive
+  if (item.isPaused === true) return false;
+
+  // Check legacy status field (in case API adds it back)
   const rawStatus = String(item.status ?? "").trim().toLowerCase();
   if (["inactive", "finished", "ended", "closed", "expired", "archived", "complete", "completed"].includes(rawStatus)) return false;
+
+  // Check end date
   const endValue = item.endDate ?? item.end_date ?? item.endsAt ?? item.ends_at ?? item.endTime ?? item.end_time;
   if (endValue) {
     const end = new Date(String(endValue));
     if (Number.isFinite(end.getTime()) && end.getTime() <= Date.now()) return false;
   }
-  return ["active", "live", "ongoing", "running", "open"].includes(rawStatus);
+
+  // If it's on the public API and not paused/ended, treat as active
+  // (previously required explicit "active" status which the API no longer provides)
+  return true;
 }
 
 function numberOrUndefined(value: unknown): number | undefined {
@@ -62,10 +77,26 @@ export class ImmunefiBountySource implements BountySource {
     return (data as ImmunefiRecord[]).map((item, index) => {
       const rawValues: string[] = [];
       collectStrings(item.assetsInScope, rawValues);
+      collectStrings(item.assets, rawValues);
       collectStrings(item.resources, rawValues);
       collectStrings(item, rawValues);
+
+      // Also include githubUrl directly if present
+      if (typeof item.githubUrl === "string" && item.githubUrl.length > 0) {
+        rawValues.push(item.githubUrl);
+      }
+
       const scopeValues = [...new Set(rawValues)];
       const urls = extractUrls(scopeValues);
+      const sourceRepos = extractGitHubRepos(scopeValues);
+
+      // Use ecosystem (singular) or ecosystems (plural) — API uses both
+      const chains = Array.isArray(item.ecosystem)
+        ? item.ecosystem.filter((x): x is string => typeof x === "string")
+        : Array.isArray(item.ecosystems)
+          ? item.ecosystems.filter((x): x is string => typeof x === "string")
+          : [];
+
       return {
         id: "immunefi:" + (item.slug ?? String(index)),
         name: typeof item.project === "string" ? item.project : (typeof item.slug === "string" ? item.slug : "program-" + index),
@@ -73,10 +104,10 @@ export class ImmunefiBountySource implements BountySource {
         url: typeof item.url === "string" ? item.url : (typeof item.slug === "string" ? "https://immunefi.com/bug-bounty/" + item.slug + "/" : "https://immunefi.com/bug-bounty/"),
         status: isCurrentlyActive(item) ? "active" : "inactive",
         maxReward: numberOrUndefined(item.maxBounty),
-        rewardCurrency: typeof item.rewardToken === "string" ? item.rewardToken : undefined,
-        chains: Array.isArray(item.ecosystems) ? item.ecosystems.filter((x): x is string => typeof x === "string") : [],
+        rewardCurrency: typeof item.rewardsToken === "string" ? item.rewardsToken : undefined,
+        chains,
         inScope: urls.length ? urls : scopeValues,
-        sourceRepos: extractGitHubRepos(scopeValues),
+        sourceRepos,
         fetchedAt
       };
     });
