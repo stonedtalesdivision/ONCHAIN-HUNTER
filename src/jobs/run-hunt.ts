@@ -20,6 +20,8 @@ import { prepareValidationBundle } from "../validation-orchestrator.js";
 import { buildBountyIntelligence, rankBountyIntelligence } from "../bounty-intelligence.js";
 import { buildResearchWorkstation } from "../research-workstation.js";
 import { rankExploitability } from "../exploitability-gate.js";
+import { analyzeContractWithAI, isAIAnalysisAvailable, getAIAnalysisStats } from "../ai-analyzer.js";
+import { detectAdvancedPatterns } from "../detectors/advanced-patterns.js";
 
 async function main(): Promise<void> {
  const huntStartedAt=Date.now();
@@ -32,6 +34,8 @@ async function main(): Promise<void> {
    scanCursor=Math.max(0,Number(saved.nextCursor??0));
  } catch {}
  const hasToken=Boolean(process.env.GITHUB_TOKEN),configuredLimit=Number(process.env.ONCHAIN_HUNTER_LIMIT??(hasToken?"5":"5")),limit=Math.max(1,Math.min(Number.isFinite(configuredLimit)?configuredLimit:1,20)),token=process.env.GITHUB_TOKEN,source=new ImmunefiBountySource();
+ const aiEnabled = isAIAnalysisAvailable();
+ console.log(JSON.stringify({event:"ai-analysis",enabled:aiEnabled}));
  console.log(JSON.stringify({event:"hunt-start",repositoryLimit:limit,authenticatedGitHub:hasToken}));
  const programs=await source.discover();console.log(JSON.stringify({event:"catalog-loaded",programsDiscovered:programs.length}));
  const candidates:unknown[]=[],structuralSummaries:unknown[]=[],evidenceGraphs:EvidenceGraph[]=[];
@@ -52,7 +56,47 @@ async function main(): Promise<void> {
     const sourceText=await fetchRawFile(file.download_url,token),structure=analyzeSolidityStructure(sourceText,file.path);
     structuralSummaries.push(structure);
     const detectorFindings=[...scanSoliditySource(sourceText,file.path),...structuralFindings(structure),...detectBrokenAccessControl(structure),...detectPhase3(structure)].map(finding=>({...finding,id:`${program.id}:${repository}:${revision.commitSha}:${finding.id}`,programId:program.id,repository,sourceRevision:revision.commitSha,scopeMatch:"yes" as const,payoutRoutes:payoutRoutesForProgram(program),evidence:[`program: ${program.id}`,`repository: ${repository}`,`revision: ${revision.commitSha}`,...finding.evidence]})) as Opportunity[];
-    return {structure,findings:deduplicateFindings(detectorFindings)};
+
+    // Advanced pattern detection from structural analysis
+    const advancedFindings = detectAdvancedPatterns(structure).map(finding => ({
+      ...finding,
+      id: `${program.id}:${repository}:${revision.commitSha}:${finding.id}`,
+      programId: program.id,
+      repository,
+      sourceRevision: revision.commitSha,
+      scopeMatch: "yes" as const,
+      payoutRoutes: payoutRoutesForProgram(program),
+      evidence: [`program: ${program.id}`, `repository: ${repository}`, `revision: ${revision.commitSha}`, ...finding.evidence]
+    })) as Opportunity[];
+
+    // AI-powered deep analysis (if GEMINI_API_KEY is configured)
+    let aiFindings: Opportunity[] = [];
+    if (aiEnabled) {
+      try {
+        const structuralContext = JSON.stringify({
+          functions: structure.functions?.map((f: any) => ({
+            name: f.name, visibility: f.visibility, modifiers: f.modifiers,
+            externalCalls: f.externalCalls, stateWrites: f.stateWrites,
+            valueTransfers: f.valueTransfers
+          }))
+        });
+        const rawAiFindings = await analyzeContractWithAI(sourceText, file.path, structuralContext);
+        aiFindings = rawAiFindings.map(finding => ({
+          ...finding,
+          id: `${program.id}:${repository}:${revision.commitSha}:${finding.id}`,
+          programId: program.id,
+          repository,
+          sourceRevision: revision.commitSha,
+          scopeMatch: "yes" as const,
+          payoutRoutes: payoutRoutesForProgram(program),
+          evidence: [`program: ${program.id}`, `repository: ${repository}`, `revision: ${revision.commitSha}`, ...finding.evidence]
+        })) as Opportunity[];
+      } catch (aiError) {
+        console.warn(JSON.stringify({event:"ai-analysis-error", file: file.path, error: aiError instanceof Error ? aiError.message : String(aiError)}));
+      }
+    }
+
+    return {structure,findings:deduplicateFindings([...detectorFindings, ...advancedFindings, ...aiFindings])};
    };
    const workers=Array.from({length:Math.min(concurrency,solidity.length)},async()=>{
     const local:{structure:ReturnType<typeof analyzeSolidityStructure>;findings:Opportunity[]}[]=[];
@@ -95,7 +139,7 @@ async function main(): Promise<void> {
  );
  await mkdir("artifacts/hunt",{recursive:true});
  await writeFile(cursorPath,JSON.stringify({nextCursor,updatedAt:new Date().toISOString(),totalTargets:monitoringTargets.length,cycleComplete},null,2),"utf8");
- const result={generatedAt:new Date().toISOString(),source:source.name,programsDiscovered:programs.length,attemptedRepositories,scannedRepositories,rateLimited,skippedRepositories,scopeReviewRequired,targetPlan,candidateFindings:findings.length,scanCursor:{start:scanCursor,next:nextCursor,totalTargets:monitoringTargets.length,cycleComplete},huntRuntimeMs:Date.now()-huntStartedAt,exploitabilityGate:{inputPackages:evidencePackages.length,validationCandidates:exploitability.assessments.filter(a=>a.tier==="validation").length,reviewCandidates:exploitability.assessments.filter(a=>a.tier==="review").length,deprioritized:exploitability.assessments.filter(a=>a.tier==="deprioritized").length,artifactPath:"artifacts/hunt/exploitability-gate.json"},payoutConfiguration,structuralAnalysis:structuralSummaries,evidenceGraphs:rankedGraphs,evidenceGraphSummary:{total:evidenceGraphs.length,unique:rankedGraphs.length,crossFunctionChains:rankedGraphs.filter(g=>g.crossFunctionPaths.length).length,critical:rankedGraphs.filter(g=>g.severity==="critical").length,high:rankedGraphs.filter(g=>g.severity==="high").length},evidencePackages,evidencePackageSummary:{total:evidencePackages.length,gatedForReview:gatedPackages.length,reviewReady:evidencePackages.filter(p=>p.submissionReady).length,withCrossFunctionChains:evidencePackages.filter(p=>p.transactionSequence.length>1).length},bountyMatchSummary:{packages:evidencePackages.length,matched:bountyMatches.filter(x=>x.matches.length).length,exactScope:bountyMatches.reduce((n,x)=>n+x.matches.filter(m=>m.scope==="exact-repository").length,0)},monitoring:{events:monitoring.events.length,eventsPath:"artifacts/monitoring/latest-events.json",statePath:"artifacts/monitoring/state.json"},investigation:{total:Object.keys(investigation.current.records).length,revisionChanges:Object.values(investigation.current.records).filter((record)=>record.revisionChanged).length,artifactPath:"artifacts/investigations/latest.json"},orchestration:{selected:orchestration.selected?.packageId??null,queue:orchestration.queue.length,artifactPath:"artifacts/investigations/orchestration.json"},proof:{total:proofDossiers.length,strong:proofDossiers.filter(p=>p.proofScore>=80).length,artifactPath:"artifacts/validation-bundles"},validationBundles:{total:validationBundles.length,prepared:validationBundles.length,executionEnabled:false,artifactPath:"artifacts/validation-bundles"},bountyMatches,bountyIntelligence:{total:bountyIntelligence.length,top:bountyIntelligence.slice(0,10),artifactPath:"artifacts/hunt/bounty-intelligence.json"},researchWorkstation:{total:workstation.summary.total,blocked:workstation.summary.blocked,readyForReview:workstation.summary.readyForReview,artifactPath:"artifacts/hunt/research-workstation.json"},results:candidates};
+ const result={generatedAt:new Date().toISOString(),source:source.name,programsDiscovered:programs.length,attemptedRepositories,scannedRepositories,rateLimited,skippedRepositories,scopeReviewRequired,targetPlan,candidateFindings:findings.length,scanCursor:{start:scanCursor,next:nextCursor,totalTargets:monitoringTargets.length,cycleComplete},huntRuntimeMs:Date.now()-huntStartedAt,exploitabilityGate:{inputPackages:evidencePackages.length,validationCandidates:exploitability.assessments.filter(a=>a.tier==="validation").length,reviewCandidates:exploitability.assessments.filter(a=>a.tier==="review").length,deprioritized:exploitability.assessments.filter(a=>a.tier==="deprioritized").length,artifactPath:"artifacts/hunt/exploitability-gate.json"},payoutConfiguration,structuralAnalysis:structuralSummaries,evidenceGraphs:rankedGraphs,evidenceGraphSummary:{total:evidenceGraphs.length,unique:rankedGraphs.length,crossFunctionChains:rankedGraphs.filter(g=>g.crossFunctionPaths.length).length,critical:rankedGraphs.filter(g=>g.severity==="critical").length,high:rankedGraphs.filter(g=>g.severity==="high").length},evidencePackages,evidencePackageSummary:{total:evidencePackages.length,gatedForReview:gatedPackages.length,reviewReady:evidencePackages.filter(p=>p.submissionReady).length,withCrossFunctionChains:evidencePackages.filter(p=>p.transactionSequence.length>1).length},bountyMatchSummary:{packages:evidencePackages.length,matched:bountyMatches.filter(x=>x.matches.length).length,exactScope:bountyMatches.reduce((n,x)=>n+x.matches.filter(m=>m.scope==="exact-repository").length,0)},monitoring:{events:monitoring.events.length,eventsPath:"artifacts/monitoring/latest-events.json",statePath:"artifacts/monitoring/state.json"},investigation:{total:Object.keys(investigation.current.records).length,revisionChanges:Object.values(investigation.current.records).filter((record)=>record.revisionChanged).length,artifactPath:"artifacts/investigations/latest.json"},orchestration:{selected:orchestration.selected?.packageId??null,queue:orchestration.queue.length,artifactPath:"artifacts/investigations/orchestration.json"},proof:{total:proofDossiers.length,strong:proofDossiers.filter(p=>p.proofScore>=80).length,artifactPath:"artifacts/validation-bundles"},validationBundles:{total:validationBundles.length,prepared:validationBundles.length,executionEnabled:false,artifactPath:"artifacts/validation-bundles"},bountyMatches,bountyIntelligence:{total:bountyIntelligence.length,top:bountyIntelligence.slice(0,10),artifactPath:"artifacts/hunt/bounty-intelligence.json"},researchWorkstation:{total:workstation.summary.total,blocked:workstation.summary.blocked,readyForReview:workstation.summary.readyForReview,artifactPath:"artifacts/hunt/research-workstation.json"},aiAnalysis:aiEnabled ? getAIAnalysisStats() : { enabled: false },results:candidates};
  await writeFile(path,JSON.stringify(result,null,2),"utf8");
  await writeFile("artifacts/hunt/bounty-intelligence.json",JSON.stringify({schemaVersion:"phase-13",generatedAt:result.generatedAt,total:bountyIntelligence.length,items:bountyIntelligence},null,2),"utf8");console.log(JSON.stringify(result,null,2));
 }
