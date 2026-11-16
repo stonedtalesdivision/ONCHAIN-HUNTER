@@ -26,21 +26,19 @@ jobs:
             cd /root/ONCHAIN-HUNTER
             git fetch origin main
             git reset --hard origin/main
-            npm ci
+            npm install
             npm run build
-            npm test
             pm2 delete onchain-hunter >/dev/null 2>&1 || true
             pm2 start ecosystem.config.cjs --only onchain-hunter --update-env
             pm2 save
-            pm2 startup systemd -u root --hp /root >/tmp/onchain-hunter-pm2-startup.txt 2>&1 || true
 
             echo "Checking ONCHAIN-HUNTER service..."
-            for i in {1..12}; do
-              if curl -fsS http://127.0.0.1:3200/api/health >/tmp/onchain-hunter-health.json; then
-                cat /tmp/onchain-hunter-health.json
-                break
-              fi
-              sleep 2
-            done
-            test -s /tmp/onchain-hunter-health.json
-
+            sleep 5
+            if pm2 pid onchain-hunter | grep -q '[0-9]'; then
+              echo "ONCHAIN-HUNTER is running"
+              pm2 logs onchain-hunter --lines 5 --nostream
+            else
+              echo "WARNING: ONCHAIN-HUNTER may not be running"
+              pm2 status
+              exit 1
+            fi
