@@ -1,0 +1,2811 @@
+{
+  "schemaVersion": "phase-8",
+  "updatedAt": "2026-11-16T04:02:55.322Z",
+  "programs": {
+    "immunefi:ondofinance": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/ondofinance/",
+      "maxReward": 1000000,
+      "chains": [
+        "ETH",
+        "Solana"
+      ],
+      "sourceRepos": [
+        "ondoprotocol/usdy-noble"
+      ]
+    },
+    "immunefi:plether": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/plether/",
+      "maxReward": 80000,
+      "chains": [
+        "Arbitrum"
+      ],
+      "sourceRepos": [
+        "immunefi-team/audit-comp-plether",
+        "Plether-Fi/plether-core",
+        "Plether-Fi/plether-app"
+      ]
+    },
+    "immunefi:metric": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/metric/",
+      "maxReward": 500000,
+      "chains": [
+        "ETH",
+        "BSC"
+      ],
+      "sourceRepos": [
+        "Metricxyz/Known_issues"
+      ]
+    },
+    "immunefi:sparklend": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/sparklend/",
+      "maxReward": 5000000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "sparkdotfi/sparklend",
+        "sparkdotfi/aave-v3-core",
+        "sparkdotfi/aave-v3-periphery",
+        "sparkdotfi/spark-app",
+        "sparkdotfi/spark-alm-controller",
+        "sparkdotfi/spark-gov-relay",
+        "sparkdotfi/spark-rewards",
+        "sparkdotfi/spark-vaults-v2"
+      ]
+    },
+    "immunefi:mtpelerin": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/mtpelerin/",
+      "maxReward": 3500,
+      "chains": [
+        "Arbitrum",
+        "Avalanche",
+        "BSC",
+        "Base",
+        "Bitcoin",
+        "ETH",
+        "Gnosis",
+        "Optimism",
+        "Polygon",
+        "Rootstock",
+        "Tezos",
+        "Celo",
+        "zkSync",
+        "Lightning",
+        "Sonic",
+        "xDAI / Gnosis Chain"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:cowprotocol": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/cowprotocol/",
+      "maxReward": 1000000,
+      "chains": [
+        "ETH",
+        "Gnosis"
+      ],
+      "sourceRepos": [
+        "cowprotocol/contracts",
+        "gnosis/gp-v2-contracts"
+      ]
+    },
+    "immunefi:ankr": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/ankr/",
+      "maxReward": 500000,
+      "chains": [
+        "BSC",
+        "ETH",
+        "Polygon"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:folksfinance": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/folksfinance/",
+      "maxReward": 100000,
+      "chains": [
+        "Algorand"
+      ],
+      "sourceRepos": [
+        "Folks-Finance/audits"
+      ]
+    },
+    "immunefi:moneyonchain": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/moneyonchain/",
+      "maxReward": 10000,
+      "chains": [
+        "RSK"
+      ],
+      "sourceRepos": [
+        "money-on-chain/Areopagus-Governance",
+        "money-on-chain/Amphiraos-Oracle",
+        "money-on-chain/known-issues"
+      ]
+    },
+    "immunefi:extrafinance": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/extrafinance/",
+      "maxReward": 100000,
+      "chains": [
+        "Optimism"
+      ],
+      "sourceRepos": [
+        "peckshield/publications",
+        "blocksecteam/audit-reports"
+      ]
+    },
+    "immunefi:dawn": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/dawn/",
+      "maxReward": 50000,
+      "chains": [
+        "Solana"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:berachain": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/berachain/",
+      "maxReward": 100000,
+      "chains": [
+        "ETH",
+        "Cosmos"
+      ],
+      "sourceRepos": [
+        "berachain/beacon-kit",
+        "berachain/contracts",
+        "berachain/cometbft",
+        "berachain/security-audits",
+        "berachain/airdrop-contracts",
+        "berachain/bera-reth"
+      ]
+    },
+    "immunefi:staderforeth": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/staderforeth/",
+      "maxReward": 1000000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:onre": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/onre/",
+      "maxReward": 100000,
+      "chains": [
+        "Solana"
+      ],
+      "sourceRepos": [
+        "onre-finance/onre-sol"
+      ]
+    },
+    "immunefi:enzyme-onyx": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/enzyme-onyx/",
+      "maxReward": 200000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "enzymefinance/onyx-sdk",
+        "enzymefinance/protocol-onyx"
+      ]
+    },
+    "immunefi:hyperlane": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/hyperlane/",
+      "maxReward": 2500000,
+      "chains": [
+        "Arbitrum",
+        "BSC",
+        "Celo",
+        "ETH",
+        "Gnosis",
+        "Moonbeam",
+        "Optimism",
+        "Polygon"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:yearnfinance": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/yearnfinance/",
+      "maxReward": 200000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:livepeer": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/livepeer/",
+      "maxReward": 40000,
+      "chains": [
+        "Arbitrum",
+        "ETH"
+      ],
+      "sourceRepos": [
+        "livepeer/protocol"
+      ]
+    },
+    "immunefi:raydium": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/raydium/",
+      "maxReward": 505000,
+      "chains": [
+        "Solana"
+      ],
+      "sourceRepos": [
+        "raydium-io/raydium-docs"
+      ]
+    },
+    "immunefi:harvest": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/harvest/",
+      "maxReward": 100000,
+      "chains": [
+        "Arbitrum",
+        "BSC",
+        "ETH",
+        "Polygon"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:axelarnetwork": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/axelarnetwork/",
+      "maxReward": 500000,
+      "chains": [
+        "Arbitrum",
+        "Avalanche",
+        "BSC",
+        "Base",
+        "Blast",
+        "Celo",
+        "Centrifuge",
+        "ETH",
+        "Fantom",
+        "Filecoin",
+        "Fraxtal",
+        "Kava",
+        "Linea",
+        "Mantle",
+        "Moonbeam",
+        "Optimism",
+        "Polygon",
+        "Scroll"
+      ],
+      "sourceRepos": [
+        "axelarnetwork/axelar-core",
+        "axelarnetwork/axelar-cgp-solidity",
+        "axelarnetwork/tofnd",
+        "axelarnetwork/tofn"
+      ]
+    },
+    "immunefi:sei": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/sei/",
+      "maxReward": 500000,
+      "chains": [
+        "Sei"
+      ],
+      "sourceRepos": [
+        "sei-protocol/sei-chain",
+        "oak-security/audit-reports"
+      ]
+    },
+    "immunefi:obyte": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/obyte/",
+      "maxReward": 50000,
+      "chains": [
+        "Obyte"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:cosmos": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/cosmos/",
+      "maxReward": 50000,
+      "chains": [
+        "Cosmos"
+      ],
+      "sourceRepos": [
+        "cosmos/cosmos-sdk",
+        "cosmos/security",
+        "cosmos/ledger-cosmos"
+      ]
+    },
+    "immunefi:zksyncera": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/zksyncera/",
+      "maxReward": 300000,
+      "chains": [
+        "ETH",
+        "zkSync"
+      ],
+      "sourceRepos": [
+        "matter-labs/zksync-era",
+        "matter-labs/era-contracts",
+        "matter-labs/zksync-protocol"
+      ]
+    },
+    "immunefi:1inch-web": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/1inch-web/",
+      "maxReward": 50000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:1inch-infrastructure": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/1inch-infrastructure/",
+      "maxReward": 20000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:1inch-wallet": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/1inch-wallet/",
+      "maxReward": 100000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:1inch-SmartContracts": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/1inch-SmartContracts/",
+      "maxReward": 500000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:1inch-aqua-improvement": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/1inch-aqua-improvement/",
+      "maxReward": 25000,
+      "chains": [],
+      "sourceRepos": [
+        "1inch/1inch-audits",
+        "1inch/sdks",
+        "1inch/swap-vm"
+      ]
+    },
+    "immunefi:1inch-aqua": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/1inch-aqua/",
+      "maxReward": 100000,
+      "chains": [],
+      "sourceRepos": [
+        "1inch/sdks",
+        "1inch/swap-vm"
+      ]
+    },
+    "immunefi:1inch-business": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/1inch-business/",
+      "maxReward": 100000,
+      "chains": [],
+      "sourceRepos": [
+        "x402-foundation/x402"
+      ]
+    },
+    "immunefi:ens": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/ens/",
+      "maxReward": 250000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "orgs/ensdomains"
+      ]
+    },
+    "immunefi:maple": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/maple/",
+      "maxReward": 500000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "maple-labs/maple-v2-audits",
+        "maple-labs/maple-core-v2"
+      ]
+    },
+    "immunefi:sky": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/sky/",
+      "maxReward": 10000000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "sky-ecosystem/gov-polling-db",
+        "sky-ecosystem/governance-portal-v2",
+        "sky-ecosystem/mcd-security",
+        "Synthetixio/synthetix",
+        "sky-ecosystem/dai.js"
+      ]
+    },
+    "immunefi:zest-protocol-v2": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/zest-protocol-v2/",
+      "maxReward": 100000,
+      "chains": [
+        "Stacks"
+      ],
+      "sourceRepos": [
+        "Zest-Protocol/zest-v2-contracts"
+      ]
+    },
+    "immunefi:enzymefinance": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/enzymefinance/",
+      "maxReward": 200000,
+      "chains": [
+        "ETH",
+        "Polygon"
+      ],
+      "sourceRepos": [
+        "enzymefinance/protocol"
+      ]
+    },
+    "immunefi:ostium": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/ostium/",
+      "maxReward": 200000,
+      "chains": [
+        "Arbitrum"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:serai": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/serai/",
+      "maxReward": 30000,
+      "chains": [],
+      "sourceRepos": [
+        "serai-dex/serai"
+      ]
+    },
+    "immunefi:defisaver": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/defisaver/",
+      "maxReward": 350000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "DecenterApps/defisaver-v3-contracts"
+      ]
+    },
+    "immunefi:pareto": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/pareto/",
+      "maxReward": 50000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:pythnetwork": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/pythnetwork/",
+      "maxReward": 125000,
+      "chains": [
+        "Solana"
+      ],
+      "sourceRepos": [
+        "pyth-network/audit-reports"
+      ]
+    },
+    "immunefi:instadapp": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/instadapp/",
+      "maxReward": 500000,
+      "chains": [
+        "Avalanche",
+        "BSC",
+        "ETH",
+        "Optimism",
+        "Polygon"
+      ],
+      "sourceRepos": [
+        "Instadapp/dsa-contracts",
+        "Instadapp/avocado-audits",
+        "statemindio/public-audits",
+        "Instadapp/fluid-contracts-public"
+      ]
+    },
+    "immunefi:0x": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/0x/",
+      "maxReward": 1000000,
+      "chains": [
+        "Polygon",
+        "Avalanche",
+        "Arbitrum",
+        "Base",
+        "BSC",
+        "ETH",
+        "Linea",
+        "Mantle",
+        "Mode",
+        "Optimism",
+        "Scroll",
+        "Solana"
+      ],
+      "sourceRepos": [
+        "0xProject/0x-settler"
+      ]
+    },
+    "immunefi:originprotocol": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/originprotocol/",
+      "maxReward": 1000000,
+      "chains": [
+        "ETH",
+        "Base",
+        "Arbitrum"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:gearbox": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/gearbox/",
+      "maxReward": 150000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "Gearbox-protocol/core-v2",
+        "Gearbox-protocol/core-v3",
+        "Gearbox-protocol/integrations-v3",
+        "Gearbox-protocol/oracles-v3",
+        "Gearbox-protocol/bots-v3",
+        "Gearbox-protocol/gearbox-contracts",
+        "Gearbox-protocol/integrations-v2",
+        "Gearbox-protocol/governance",
+        "Gearbox-protocol/security"
+      ]
+    },
+    "immunefi:nexusmutual": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/nexusmutual/",
+      "maxReward": 25000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:rocketpool": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/rocketpool/",
+      "maxReward": 150000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "rocket-pool/rocketpool"
+      ]
+    },
+    "immunefi:granite-protocol": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/granite-protocol/",
+      "maxReward": 100000,
+      "chains": [
+        "Stacks"
+      ],
+      "sourceRepos": [
+        "GraniteProtocol/audits"
+      ]
+    },
+    "immunefi:wormhole": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/wormhole/",
+      "maxReward": 1000000,
+      "chains": [],
+      "sourceRepos": [
+        "wormhole-foundation/wormhole"
+      ]
+    },
+    "immunefi:arbitrum": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/arbitrum/",
+      "maxReward": 2000000,
+      "chains": [
+        "Arbitrum",
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:thresholdnetwork": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/thresholdnetwork/",
+      "maxReward": 150000,
+      "chains": [
+        "Arbitrum",
+        "ETH",
+        "Optimism",
+        "Polygon",
+        "Solana",
+        "Base",
+        "Starknet",
+        "SUI"
+      ],
+      "sourceRepos": [
+        "threshold-network/token-dashboard",
+        "keep-network/keep-core",
+        "Thesis-Defense/Security-Audit-Reports",
+        "threshold-network/solidity-contracts",
+        "keep-network/tbtc-v2",
+        "threshold-network/tbtc-v2"
+      ]
+    },
+    "immunefi:openzeppelin": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/openzeppelin/",
+      "maxReward": 25000,
+      "chains": [],
+      "sourceRepos": [
+        "OpenZeppelin/openzeppelin-contracts",
+        "OpenZeppelin/uniswap-hooks"
+      ]
+    },
+    "immunefi:openzeppelin-stellar": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/openzeppelin-stellar/",
+      "maxReward": 25000,
+      "chains": [],
+      "sourceRepos": [
+        "OpenZeppelin/stellar-contracts"
+      ]
+    },
+    "immunefi:gmtrade": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/gmtrade/",
+      "maxReward": 100000,
+      "chains": [
+        "Solana"
+      ],
+      "sourceRepos": [
+        "gmsol-labs/gmx-solana",
+        "gmsol-labs/gmx-solana-audits"
+      ]
+    },
+    "immunefi:gmx": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/gmx/",
+      "maxReward": 5000000,
+      "chains": [
+        "Arbitrum",
+        "Avalanche"
+      ],
+      "sourceRepos": [
+        "gmx-io/gmx-contracts",
+        "gmx-io/gmx-synthetics",
+        "GuardianAudits/Audits"
+      ]
+    },
+    "immunefi:unstoppablewallet": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/unstoppablewallet/",
+      "maxReward": 1000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:alchemix-1": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/alchemix-1/",
+      "maxReward": 150000,
+      "chains": [
+        "Arbitrum",
+        "ETH",
+        "Optimism",
+        "Base"
+      ],
+      "sourceRepos": [
+        "alchemix-finance/v3-poc",
+        "alchemix-finance/v3"
+      ]
+    },
+    "immunefi:beanstalk": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/beanstalk/",
+      "maxReward": 1100000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "BeanstalkFarms/Beanstalk",
+        "BeanstalkFarms/Basin",
+        "BeanstalkFarms/Pipeline",
+        "BeanstalkFarms/Beanstalk-Audits"
+      ]
+    },
+    "immunefi:stargate": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/stargate/",
+      "maxReward": 3500000,
+      "chains": [
+        "ETH",
+        "Arbitrum",
+        "Solana",
+        "Aptos",
+        "Avalanche",
+        "Base",
+        "Blast",
+        "BSC",
+        "Fantom",
+        "Fraxtal",
+        "Fuse",
+        "Horizen EON",
+        "Injective",
+        "Kava",
+        "Linea",
+        "Manta",
+        "Mantle",
+        "Moonbeam",
+        "Metis",
+        "Optimism",
+        "Orderly",
+        "Polygon",
+        "LayerZero",
+        "Sei",
+        "Scroll",
+        "Rootstock",
+        "Starknet",
+        "SUI",
+        "Telos",
+        "TON",
+        "Tron",
+        "zkSync"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:layerzero": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/layerzero/",
+      "maxReward": 3500000,
+      "chains": [
+        "Arbitrum",
+        "Astar zkEVM",
+        "Aurora",
+        "Avalanche",
+        "BSC",
+        "Base",
+        "Blast",
+        "Canto",
+        "Celo",
+        "Conflux",
+        "DOS",
+        "ETH",
+        "Fantom",
+        "Fraxtal",
+        "Fuse",
+        "Gnosis",
+        "Harmony",
+        "Horizen EON",
+        "Injective",
+        "Kava",
+        "Linea",
+        "Manta",
+        "Mantle",
+        "Merit Circle",
+        "Metis",
+        "Mode",
+        "Moonbeam",
+        "Moonriver",
+        "Optimism",
+        "Orderly",
+        "Polygon",
+        "Polygon zkEVM",
+        "Scroll",
+        "ShimmerEVM",
+        "Telos",
+        "Tenet",
+        "Viction",
+        "XPLA",
+        "Xai",
+        "Zora",
+        "opBNB",
+        "Aptos",
+        "Cronos",
+        "Rootstock",
+        "Sei",
+        "TON",
+        "LayerZero",
+        "Merlin",
+        "Solana",
+        "Starknet",
+        "SUI",
+        "Tron",
+        "xDAI / Gnosis Chain",
+        "zkSync",
+        "Sonic"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:silofinance-v2": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/silofinance-v2/",
+      "maxReward": 100000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "silo-finance/silo-contracts-v3"
+      ]
+    },
+    "immunefi:magpiexyz": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/magpiexyz/",
+      "maxReward": 50000,
+      "chains": [
+        "BSC",
+        "Arbitrum",
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:paxos-labs": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/paxos-labs/",
+      "maxReward": 500000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "paxoslabs/pxl-boring-vault"
+      ]
+    },
+    "immunefi:sp1": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/sp1/",
+      "maxReward": 15000,
+      "chains": [],
+      "sourceRepos": [
+        "succinctlabs/sp1",
+        "code-423n4/succinct-bug-bounty",
+        "succinctlabs/sp1-cluster"
+      ]
+    },
+    "immunefi:sbtc": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/sbtc/",
+      "maxReward": 250000,
+      "chains": [
+        "Stacks",
+        "Bitcoin"
+      ],
+      "sourceRepos": [
+        "stacks-sbtc/sbtc"
+      ]
+    },
+    "immunefi:zksync-os": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/zksync-os/",
+      "maxReward": 100000,
+      "chains": [
+        "zkSync"
+      ],
+      "sourceRepos": [
+        "matter-labs/zksync-os"
+      ]
+    },
+    "immunefi:rootstocklabs": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/rootstocklabs/",
+      "maxReward": 200000,
+      "chains": [
+        "Rootstock"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:etherfi": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/etherfi/",
+      "maxReward": 500000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "etherfi-protocol/smart-contracts"
+      ]
+    },
+    "immunefi:compoundfinance": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/compoundfinance/",
+      "maxReward": 1000000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:lombard-finance": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/lombard-finance/",
+      "maxReward": 500000,
+      "chains": [
+        "Bitcoin"
+      ],
+      "sourceRepos": [
+        "lombard-finance/evm-smart-contracts",
+        "lombard-finance/sol-svm-contracts",
+        "lombard-finance/sui-move-contracts",
+        "lombard-finance/starknet-cairo-contracts"
+      ]
+    },
+    "immunefi:variational": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/variational/",
+      "maxReward": 100000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:balancer": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/balancer/",
+      "maxReward": 1000000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "balancer/balancer-v2-monorepo",
+        "balancer/balancer-v3-monorepo",
+        "balancer/reclamm"
+      ]
+    },
+    "immunefi:stacks": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/stacks/",
+      "maxReward": 250000,
+      "chains": [
+        "Stacks",
+        "Bitcoin"
+      ],
+      "sourceRepos": [
+        "stacks-network/stacks-core"
+      ]
+    },
+    "immunefi:chainlink": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/chainlink/",
+      "maxReward": 3000000,
+      "chains": [
+        "Arbitrum",
+        "Base",
+        "Celo",
+        "ETH",
+        "Fantom",
+        "Gnosis",
+        "Linea",
+        "Metis",
+        "Moonriver",
+        "Optimism",
+        "Polygon",
+        "Scroll",
+        "Solana",
+        "Aptos"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:celer": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/celer/",
+      "maxReward": 200000,
+      "chains": [
+        "Arbitrum",
+        "Avalanche",
+        "BSC",
+        "Base",
+        "ETH",
+        "Fantom",
+        "Moonbeam",
+        "Optimism",
+        "Polygon"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:optimism": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/optimism/",
+      "maxReward": 2000042,
+      "chains": [
+        "ETH",
+        "Optimism"
+      ],
+      "sourceRepos": [
+        "ethereum-optimism/optimism",
+        "ethereum/devp2p",
+        "ethereum-optimism/superchain-registry",
+        "paradigmxyz/reth"
+      ]
+    },
+    "immunefi:filecoin": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/filecoin/",
+      "maxReward": 50000,
+      "chains": [
+        "Filecoin"
+      ],
+      "sourceRepos": [
+        "whyrusleeping/cbor-gen",
+        "lurklab/neptune",
+        "lurklab/trition",
+        "filecoin-project/FEVM-Hardhat-Kit",
+        "filecoin-project/awesome-filecoin",
+        "filecoin-project/FIPs",
+        "FilecoinFoundationWeb/filecoin-audit-kit"
+      ]
+    },
+    "immunefi:twyne": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/twyne/",
+      "maxReward": 50000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:gnosischain": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/gnosischain/",
+      "maxReward": 2000000,
+      "chains": [
+        "BSC",
+        "ETH"
+      ],
+      "sourceRepos": [
+        "gnosischain/tokenbridge-contracts",
+        "gnosischain/omnibridge"
+      ]
+    },
+    "immunefi:derive": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/derive/",
+      "maxReward": 50000,
+      "chains": [
+        "Optimism"
+      ],
+      "sourceRepos": [
+        "sigp/public-audits"
+      ]
+    },
+    "immunefi:audit-competition-ens": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-competition-ens/",
+      "maxReward": 70000,
+      "chains": [],
+      "sourceRepos": [
+        "ensdomains/ensjs"
+      ]
+    },
+    "immunefi:trufin": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/trufin/",
+      "maxReward": 20000,
+      "chains": [
+        "ETH",
+        "Polygon",
+        "Solana"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:debridge": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/debridge/",
+      "maxReward": 200000,
+      "chains": [
+        "Arbitrum",
+        "Avalanche",
+        "BSC",
+        "ETH",
+        "Fantom",
+        "Heco",
+        "Polygon"
+      ],
+      "sourceRepos": [
+        "debridge-finance/debridge-contracts-v1"
+      ]
+    },
+    "immunefi:avalanche": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/avalanche/",
+      "maxReward": 100000,
+      "chains": [],
+      "sourceRepos": [
+        "ethereum/go-ethereum",
+        "ava-labs/audits",
+        "ava-labs/avalanchego-internal",
+        "ava-labs/subnet-evm",
+        "ava-labs/coreth"
+      ]
+    },
+    "immunefi:avalabs": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/avalabs/",
+      "maxReward": 10000,
+      "chains": [
+        "Avalanche"
+      ],
+      "sourceRepos": [
+        "ava-labs/audits",
+        "ava-labs/core-mobile"
+      ]
+    },
+    "immunefi:nuva": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/nuva/",
+      "maxReward": 40000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:exactly": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/exactly/",
+      "maxReward": 25000,
+      "chains": [
+        "Optimism"
+      ],
+      "sourceRepos": [
+        "exactly/audits"
+      ]
+    },
+    "immunefi:xoxno": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/xoxno/",
+      "maxReward": 20000,
+      "chains": [],
+      "sourceRepos": [
+        "XOXNO/rs-lending-xlm"
+      ]
+    },
+    "immunefi:symbiosis": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/symbiosis/",
+      "maxReward": 100000,
+      "chains": [
+        "Avalanche",
+        "BSC",
+        "ETH",
+        "Polygon",
+        "Arbitrum",
+        "Base",
+        "Bitcoin",
+        "Boba Network",
+        "Cronos",
+        "Manta",
+        "Mantle",
+        "Metis",
+        "Rootstock",
+        "Sei",
+        "Sonic",
+        "Telos",
+        "TON",
+        "Tron"
+      ],
+      "sourceRepos": [
+        "symbiosis-finance/audits"
+      ]
+    },
+    "immunefi:audit-comp-firelight-1": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-firelight-1/",
+      "maxReward": 20000,
+      "chains": [],
+      "sourceRepos": [
+        "immunefi-team/audit-comp-firelight"
+      ]
+    },
+    "immunefi:ssvnetwork": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/ssvnetwork/",
+      "maxReward": 250000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "ssvlabs/ssv-network"
+      ]
+    },
+    "immunefi:usdt0": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/usdt0/",
+      "maxReward": 6000000,
+      "chains": [],
+      "sourceRepos": [
+        "Everdawn-Labs/usdt0-audit-reports"
+      ]
+    },
+    "immunefi:hedera": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/hedera/",
+      "maxReward": 30000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:zerion": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/zerion/",
+      "maxReward": 25000,
+      "chains": [
+        "Arbitrum",
+        "Avalanche",
+        "BSC",
+        "ETH",
+        "Fantom",
+        "Optimism",
+        "Polygon",
+        "xDAI / Gnosis Chain"
+      ],
+      "sourceRepos": [
+        "zeriontech/defi-sdk"
+      ]
+    },
+    "immunefi:horizen": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/horizen/",
+      "maxReward": 10000,
+      "chains": [
+        "Base"
+      ],
+      "sourceRepos": [
+        "HorizenOfficial/staker"
+      ]
+    },
+    "immunefi:ipor": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/ipor/",
+      "maxReward": 1000,
+      "chains": [
+        "Arbitrum",
+        "ETH"
+      ],
+      "sourceRepos": [
+        "IPOR-Labs/ipor-protocol",
+        "IPOR-Labs/ipor-power-tokens",
+        "IPOR-Labs/ipor-audit-reports"
+      ]
+    },
+    "immunefi:dhedge": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/dhedge/",
+      "maxReward": 50000,
+      "chains": [
+        "Arbitrum",
+        "Base",
+        "ETH",
+        "Optimism",
+        "Polygon"
+      ],
+      "sourceRepos": [
+        "dhedge/V2-Public"
+      ]
+    },
+    "immunefi:audit-comp-quantus": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-quantus/",
+      "maxReward": 20000,
+      "chains": [],
+      "sourceRepos": [
+        "Quantus-Network/l",
+        "Quantus-Network/quantus-cli"
+      ]
+    },
+    "immunefi:aera": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/aera/",
+      "maxReward": 500000,
+      "chains": [
+        "ETH",
+        "Arbitrum",
+        "Base",
+        "Polygon",
+        "Optimism"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:capyfi": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/capyfi/",
+      "maxReward": 1000000,
+      "chains": [],
+      "sourceRepos": [
+        "Capyfi/capyfi-smart-contracts"
+      ]
+    },
+    "immunefi:xterio": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/xterio/",
+      "maxReward": 80000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "peckshield/publications"
+      ]
+    },
+    "immunefi:immunefi": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/immunefi/",
+      "maxReward": 50000,
+      "chains": [
+        "ETH",
+        "Optimism"
+      ],
+      "sourceRepos": [
+        "immunefi-team/vaults-splitter"
+      ]
+    },
+    "immunefi:strata": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/strata/",
+      "maxReward": 250000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "Strata-Markets/contracts-internal",
+        "Strata-Markets/contracts"
+      ]
+    },
+    "immunefi:stackingdao": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/stackingdao/",
+      "maxReward": 100000,
+      "chains": [
+        "Stacks"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:charm": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/charm/",
+      "maxReward": 6000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:leather": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/leather/",
+      "maxReward": 5000,
+      "chains": [
+        "Stacks",
+        "Bitcoin"
+      ],
+      "sourceRepos": [
+        "leather-io/mono"
+      ]
+    },
+    "immunefi:thegraph": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/thegraph/",
+      "maxReward": 50000,
+      "chains": [
+        "Arbitrum",
+        "ETH"
+      ],
+      "sourceRepos": [
+        "graphprotocol/token-distribution",
+        "graphprotocol/contracts"
+      ]
+    },
+    "immunefi:intuition": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/intuition/",
+      "maxReward": 100000,
+      "chains": [
+        "Base"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:pancakeswap": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/pancakeswap/",
+      "maxReward": 1000000,
+      "chains": [
+        "BSC"
+      ],
+      "sourceRepos": [
+        "Uniswap/v4-periphery"
+      ]
+    },
+    "immunefi:autonolas": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/autonolas/",
+      "maxReward": 5000,
+      "chains": [
+        "ETH",
+        "Base",
+        "Celo",
+        "Gnosis",
+        "Optimism",
+        "Polygon",
+        "Arbitrum",
+        "Mode"
+      ],
+      "sourceRepos": [
+        "valory-xyz/autonolas-governance",
+        "valory-xyz/autonolas-registries",
+        "valory-xyz/autonolas-tokenomics",
+        "valory-xyz/autonolas-marketplace"
+      ]
+    },
+    "immunefi:orca": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/orca/",
+      "maxReward": 500000,
+      "chains": [
+        "Solana"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:polygon": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/polygon/",
+      "maxReward": 250000,
+      "chains": [
+        "ETH",
+        "Polygon"
+      ],
+      "sourceRepos": [
+        "0xPolygon/sPOL-contracts"
+      ]
+    },
+    "immunefi:justlenddao": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/justlenddao/",
+      "maxReward": 50000,
+      "chains": [
+        "Tron"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:acala": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/acala/",
+      "maxReward": 1000,
+      "chains": [
+        "Polkadot"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:blockpinetwork": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/blockpinetwork/",
+      "maxReward": 5000,
+      "chains": [
+        "Arbitrum",
+        "Avalanche",
+        "BSC",
+        "Base",
+        "Cronos",
+        "ETH",
+        "Fantom",
+        "Gnosis",
+        "Klaytn",
+        "Linea",
+        "Meter",
+        "Oasis",
+        "Optimism",
+        "Polygon",
+        "Scroll",
+        "Starknet",
+        "Viction",
+        "zkSync"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:royco": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/royco/",
+      "maxReward": 250000,
+      "chains": [
+        "ETH",
+        "Arbitrum",
+        "Base",
+        "Avalanche"
+      ],
+      "sourceRepos": [
+        "roycoprotocol/royco-day",
+        "roycoprotocol/royco-dawn"
+      ]
+    },
+    "immunefi:ethena": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/ethena/",
+      "maxReward": 3000000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:benqi": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/benqi/",
+      "maxReward": 500000,
+      "chains": [
+        "Avalanche"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:katana": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/katana/",
+      "maxReward": 80000,
+      "chains": [],
+      "sourceRepos": [
+        "katana-network/kat-token",
+        "agglayer/vault-bridge",
+        "yearn/yearn-vaults-v3",
+        "agglayer/lxly-bridge-and-call",
+        "agglayer/ulxly-contracts"
+      ]
+    },
+    "immunefi:Aevo": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/Aevo/",
+      "maxReward": 300000,
+      "chains": [
+        "Avalanche",
+        "BSC",
+        "ETH",
+        "Solana"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:olympus": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/olympus/",
+      "maxReward": 3333333,
+      "chains": [
+        "Arbitrum",
+        "Avalanche",
+        "Boba Network",
+        "ETH",
+        "Fantom",
+        "Optimism",
+        "Polygon"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:audit-comp-base-azul": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-base-azul/",
+      "maxReward": 250000,
+      "chains": [
+        "Base"
+      ],
+      "sourceRepos": [
+        "base/base",
+        "base/contract-deployments",
+        "base/contracts",
+        "base/node",
+        "ethereum-optimism/optimism"
+      ]
+    },
+    "immunefi:rhinofi": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/rhinofi/",
+      "maxReward": 2000000,
+      "chains": [
+        "Arbitrum",
+        "BSC",
+        "ETH",
+        "Optimism",
+        "Polygon",
+        "Polygon zkEVM",
+        "zkSync",
+        "Starknet",
+        "Tron",
+        "Base"
+      ],
+      "sourceRepos": [
+        "starkware-libs/starkex-contracts",
+        "rhinofi/contracts_public"
+      ]
+    },
+    "immunefi:hydration": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/hydration/",
+      "maxReward": 222222,
+      "chains": [
+        "Polkadot"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:hermetica": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/hermetica/",
+      "maxReward": 100000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:berachain-webapps": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/berachain-webapps/",
+      "maxReward": 10000,
+      "chains": [],
+      "sourceRepos": [
+        "berachain/beacon-kit"
+      ]
+    },
+    "immunefi:firedancer-v1-audit-comp": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/firedancer-v1-audit-comp/",
+      "maxReward": 1000000,
+      "chains": [
+        "Solana"
+      ],
+      "sourceRepos": [
+        "firedancer-io/firedancer"
+      ]
+    },
+    "immunefi:parallel": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/parallel/",
+      "maxReward": 250000,
+      "chains": [
+        "ETH",
+        "Polygon",
+        "Arbitrum",
+        "Avalanche",
+        "Base",
+        "Gnosis",
+        "LayerZero",
+        "Optimism",
+        "Scroll",
+        "Sei",
+        "BSC",
+        "xDAI / Gnosis Chain"
+      ],
+      "sourceRepos": [
+        "parallel-protocol/parallel-parallelizer",
+        "parallel-protocol/parallel-prl"
+      ]
+    },
+    "immunefi:lido": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/lido/",
+      "maxReward": 2000000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "lidofinance/easy-track"
+      ]
+    },
+    "immunefi:marinade": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/marinade/",
+      "maxReward": 250000,
+      "chains": [
+        "Solana"
+      ],
+      "sourceRepos": [
+        "marinade-finance/liquid-staking-program"
+      ]
+    },
+    "immunefi:synthetix": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/synthetix/",
+      "maxReward": 100000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:hashflow": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/hashflow/",
+      "maxReward": 50000,
+      "chains": [
+        "Arbitrum",
+        "Avalanche",
+        "BSC",
+        "ETH",
+        "Optimism",
+        "Polygon",
+        "Solana"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:tetu": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/tetu/",
+      "maxReward": 2000,
+      "chains": [
+        "Polygon"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:listadao": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/listadao/",
+      "maxReward": 1000000,
+      "chains": [
+        "BSC"
+      ],
+      "sourceRepos": [
+        "lista-dao/synclub-contracts",
+        "lista-dao/lista-token",
+        "lista-dao/moolah"
+      ]
+    },
+    "immunefi:gammaswap": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/gammaswap/",
+      "maxReward": 40000,
+      "chains": [
+        "Arbitrum"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:audit-comp-folks-finance-staking-contracts": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-folks-finance-staking-contracts/",
+      "maxReward": 25000,
+      "chains": [
+        "Algorand"
+      ],
+      "sourceRepos": [
+        "Folks-Finance/algorand-ntt-contracts"
+      ]
+    },
+    "immunefi:aave": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/aave/",
+      "maxReward": 1000000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "bgd-labs/aave-address-book",
+        "aave-dao/gho-origin",
+        "aave-dao/aave-v3-origin",
+        "aave/aave-v3-core",
+        "aave/protocol-v2",
+        "bgd-labs/aave-governance-v3",
+        "smartcontractkit/ccip"
+      ]
+    },
+    "immunefi:aster": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/aster/",
+      "maxReward": 200000,
+      "chains": [],
+      "sourceRepos": [
+        "asterdex/api-docs"
+      ]
+    },
+    "immunefi:edgex": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/edgex/",
+      "maxReward": 10000,
+      "chains": [],
+      "sourceRepos": [
+        "edgex-Tech/audit-reports"
+      ]
+    },
+    "immunefi:xrpl-ripple-attackathon": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/xrpl-ripple-attackathon/",
+      "maxReward": 200000,
+      "chains": [],
+      "sourceRepos": [
+        "XRPLF/rippled"
+      ]
+    },
+    "immunefi:bobanetwork": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/bobanetwork/",
+      "maxReward": 100000,
+      "chains": [
+        "Avalanche",
+        "BSC",
+        "ETH"
+      ],
+      "sourceRepos": [
+        "bobanetwork/boba",
+        "bobanetwork/boba_legacy"
+      ]
+    },
+    "immunefi:fluxfinance": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/fluxfinance/",
+      "maxReward": 550000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "compound-finance/compound-protocol"
+      ]
+    },
+    "immunefi:kleidi": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/kleidi/",
+      "maxReward": 50000,
+      "chains": [],
+      "sourceRepos": [
+        "solidity-labs-io/kleidi"
+      ]
+    },
+    "immunefi:yo-protocol": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/yo-protocol/",
+      "maxReward": 10000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:velvet-capital-v2": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/velvet-capital-v2/",
+      "maxReward": 10000,
+      "chains": [
+        "BSC"
+      ],
+      "sourceRepos": [
+        "Velvet-Capital/audits"
+      ]
+    },
+    "immunefi:velvetcapital": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/velvetcapital/",
+      "maxReward": 51000,
+      "chains": [
+        "BSC"
+      ],
+      "sourceRepos": [
+        "Velvet-Capital/audits"
+      ]
+    },
+    "immunefi:swaylend-frontend-iop": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/swaylend-frontend-iop/",
+      "maxReward": 30000,
+      "chains": [
+        "Fuel Network"
+      ],
+      "sourceRepos": [
+        "Swaylend/swaylend-monorepo"
+      ]
+    },
+    "immunefi:immutable": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/immutable/",
+      "maxReward": 1000000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:alchemix-v3-audit-competition": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/alchemix-v3-audit-competition/",
+      "maxReward": 100000,
+      "chains": [],
+      "sourceRepos": [
+        "alchemix-finance/v3-poc"
+      ]
+    },
+    "immunefi:audit-comp-belong": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-belong/",
+      "maxReward": 30000,
+      "chains": [],
+      "sourceRepos": [
+        "belongnet/checkin-contracts"
+      ]
+    },
+    "immunefi:audit-comp-flare-fassets": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-flare-fassets/",
+      "maxReward": 125000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "flare-foundation/fassets"
+      ]
+    },
+    "immunefi:flare-fassets--mitigation-audit": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/flare-fassets--mitigation-audit/",
+      "maxReward": 25000,
+      "chains": [],
+      "sourceRepos": [
+        "flare-foundation/fassets",
+        "flare-labs-ltd/fassets"
+      ]
+    },
+    "immunefi:arkadiko": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/arkadiko/",
+      "maxReward": 100000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:firedancer-boost": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/firedancer-boost/",
+      "maxReward": 1000000,
+      "chains": [
+        "Solana"
+      ],
+      "sourceRepos": [
+        "anza-xyz/agave",
+        "firedancer-io/firedancer",
+        "immunefi-team/Bounty_Boosts",
+        "firedancer-io/audits"
+      ]
+    },
+    "immunefi:audit-comp-vechain-stargate-hayabusa": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-vechain-stargate-hayabusa/",
+      "maxReward": 40000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:lido-v3-bug-bounty-competition": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/lido-v3-bug-bounty-competition/",
+      "maxReward": 2000000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "lidofinance/core",
+        "lidofinance/lido-oracle",
+        "lidofinance/audits",
+        "orgs/lidofinance"
+      ]
+    },
+    "immunefi:plume-network-attackathon": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/plume-network-attackathon/",
+      "maxReward": 200000,
+      "chains": [],
+      "sourceRepos": [
+        "plumenetwork/contracts"
+      ]
+    },
+    "immunefi:avail": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/avail/",
+      "maxReward": 250000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "availproject/audits"
+      ]
+    },
+    "immunefi:audit-comp-firelight": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-firelight/",
+      "maxReward": 15000,
+      "chains": [],
+      "sourceRepos": [
+        "firelight-protocol/firelight-core"
+      ]
+    },
+    "immunefi:vechain-hayabusa-upgrade-attackathon": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/vechain-hayabusa-upgrade-attackathon/",
+      "maxReward": 160000,
+      "chains": [],
+      "sourceRepos": [
+        "vechain/thor-hayabusa",
+        "vechain/thor",
+        "vechain/hayabusa-e2e",
+        "vechain/VIPs",
+        "slowmist/Knowledge-Base"
+      ]
+    },
+    "immunefi:audit-comp--folks-finance-wormhole-ntt-on-algorand": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp--folks-finance-wormhole-ntt-on-algorand/",
+      "maxReward": 30000,
+      "chains": [
+        "Algorand"
+      ],
+      "sourceRepos": [
+        "Folks-Finance/algorand-ntt-contracts",
+        "Folks-Finance/audits",
+        "Folks-Finance/algorand-smart-contract-library",
+        "wormhole-foundation/native-token-transfers",
+        "wormhole-foundation/wormhole"
+      ]
+    },
+    "immunefi:fuel-network-attackathon": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/fuel-network-attackathon/",
+      "maxReward": 1000000,
+      "chains": [
+        "Fuel Network"
+      ],
+      "sourceRepos": [
+        "FuelLabs/fuel-bridge",
+        "FuelLabs/sway",
+        "FuelLabs/sway-standards",
+        "FuelLabs/fuel-core",
+        "FuelLabs/fuel-vm",
+        "FuelLabs/fuels-ts",
+        "FuelLabs/fuel-connectors",
+        "FuelLabs/fuels-wallet",
+        "FuelLabs/audits",
+        "FuelLabs/fuels-rs",
+        "FuelLabs/sway-playground",
+        "FuelLabs/fuel-explorer"
+      ]
+    },
+    "immunefi:sushiswap": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/sushiswap/",
+      "maxReward": 200000,
+      "chains": [
+        "Arbitrum",
+        "Avalanche",
+        "BSC",
+        "Celo",
+        "ETH",
+        "Fantom",
+        "Gnosis",
+        "Harmony",
+        "Heco",
+        "Kava",
+        "Linea",
+        "Metis",
+        "Moonbeam",
+        "Optimism",
+        "Polygon"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:lido-bug-bounty-competition": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/lido-bug-bounty-competition/",
+      "maxReward": 2000000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "lidofinance/dual-governance",
+        "OpenZeppelin/openzeppelin-contracts"
+      ]
+    },
+    "immunefi:folks-sc-library": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/folks-sc-library/",
+      "maxReward": 30000,
+      "chains": [
+        "Algorand"
+      ],
+      "sourceRepos": [
+        "Folks-Finance/algorand-smart-contract-library"
+      ]
+    },
+    "immunefi:iop-paradex": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/iop-paradex/",
+      "maxReward": 45000,
+      "chains": [],
+      "sourceRepos": [
+        "Cairo-Security-Clan/Audit-Portfolio",
+        "tradeparadex/paradex-docs"
+      ]
+    },
+    "immunefi:iop-zano-trade": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/iop-zano-trade/",
+      "maxReward": 20000,
+      "chains": [],
+      "sourceRepos": [
+        "PRavaga/zano-p2p"
+      ]
+    },
+    "immunefi:iop-term-structure": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/iop-term-structure/",
+      "maxReward": 6000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:audit-comp-spectra-finance": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-spectra-finance/",
+      "maxReward": 40000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:iop-circuitdao": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/iop-circuitdao/",
+      "maxReward": 10000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:marsecosystem": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/marsecosystem/",
+      "maxReward": 10000,
+      "chains": [
+        "BSC",
+        "ETH"
+      ],
+      "sourceRepos": [
+        "MarsEcosystem/mars-resource"
+      ]
+    },
+    "immunefi:stacks-attackathon-2": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/stacks-attackathon-2/",
+      "maxReward": 250000,
+      "chains": [
+        "Bitcoin",
+        "Stacks"
+      ],
+      "sourceRepos": [
+        "stacksgov/sips",
+        "stacks-network/sbtc"
+      ]
+    },
+    "immunefi:movement-labs-attackathon": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/movement-labs-attackathon/",
+      "maxReward": 400000,
+      "chains": [],
+      "sourceRepos": [
+        "movementlabsxyz/movement",
+        "aptos-labs/aptos-core",
+        "movementlabsxyz/layerzero-devtools",
+        "movementlabsxyz/aptos-core"
+      ]
+    },
+    "immunefi:ethereum-protocol-attackathon": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/ethereum-protocol-attackathon/",
+      "maxReward": 1500000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "ethereum/consensus-specs",
+        "ethereum/execution-specs",
+        "protolambda/remerkleable",
+        "ethereum/public-disclosures"
+      ]
+    },
+    "immunefi:audit-comp-yeet": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-yeet/",
+      "maxReward": 30000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:audit-comp-lombard": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-lombard/",
+      "maxReward": 100000,
+      "chains": [],
+      "sourceRepos": [
+        "lombard-finance/evm-smart-contracts",
+        "OpenZeppelin/openzeppelin-contracts",
+        "OpenZeppelin/openzeppelin-contracts-upgradeable",
+        "Cyfrin/ccip-contracts",
+        "LayerZero-Labs/LayerZero-v2"
+      ]
+    },
+    "immunefi:audit-comp-butter": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-butter/",
+      "maxReward": 30000,
+      "chains": [],
+      "sourceRepos": [
+        "makerdao/sdai",
+        "makerdao/usds",
+        "aave/gho-core",
+        "ethena-labs/code4arena-contest",
+        "butterygg/conditional-tokens-contracts",
+        "butterygg/1155-to-20",
+        "immunefi-team/audit-comp-butter-cfm-v1"
+      ]
+    },
+    "immunefi:audit-comp-shardeum-core-iii": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-shardeum-core-iii/",
+      "maxReward": 250000,
+      "chains": [
+        "Shardeum"
+      ],
+      "sourceRepos": [
+        "shardeum/archiver",
+        "shardeum/core",
+        "shardeum/shardeum"
+      ]
+    },
+    "immunefi:hibachi": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/hibachi/",
+      "maxReward": 20000,
+      "chains": [
+        "Celestia"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:audit-comp-shardeum-ancillaries-iii": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-shardeum-ancillaries-iii/",
+      "maxReward": 100000,
+      "chains": [
+        "Shardeum"
+      ],
+      "sourceRepos": [
+        "shardeum/archiver",
+        "shardeum/core",
+        "shardeum/shardeum"
+      ]
+    },
+    "immunefi:iop-zano": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/iop-zano/",
+      "maxReward": 25000,
+      "chains": [],
+      "sourceRepos": [
+        "hyle-team/zano",
+        "hyle-team/docs",
+        "immunefi-team/zano-iop"
+      ]
+    },
+    "immunefi:kelp-dao": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/kelp-dao/",
+      "maxReward": 250000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:mETH": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/mETH/",
+      "maxReward": 500000,
+      "chains": [],
+      "sourceRepos": [
+        "lidofinance/lido-dao"
+      ]
+    },
+    "immunefi:beets": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/beets/",
+      "maxReward": 200000,
+      "chains": [
+        "Fantom",
+        "Optimism"
+      ],
+      "sourceRepos": [
+        "beethovenxfi/sonic-staking"
+      ]
+    },
+    "immunefi:audit-comp-celo": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-celo/",
+      "maxReward": 50000,
+      "chains": [],
+      "sourceRepos": [
+        "ethereum-optimism/op-geth",
+        "celo-org/staked-celo"
+      ]
+    },
+    "immunefi:stacks-attackathon-1": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/stacks-attackathon-1/",
+      "maxReward": 250000,
+      "chains": [
+        "Bitcoin",
+        "Stacks"
+      ],
+      "sourceRepos": [
+        "stacksgov/sips",
+        "stacks-network/sbtc"
+      ]
+    },
+    "immunefi:utix": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/utix/",
+      "maxReward": 500000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:fbtc": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/fbtc/",
+      "maxReward": 100000,
+      "chains": [],
+      "sourceRepos": [
+        "fbtc-xyz/fbtc-contract"
+      ]
+    },
+    "immunefi:jito-restaking-audit-competition": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/jito-restaking-audit-competition/",
+      "maxReward": 150000,
+      "chains": [
+        "Solana"
+      ],
+      "sourceRepos": [
+        "jito-foundation/restaking"
+      ]
+    },
+    "immunefi:folks-finance-liquid-staking-audit-competition": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/folks-finance-liquid-staking-audit-competition/",
+      "maxReward": 30000,
+      "chains": [],
+      "sourceRepos": [
+        "Folks-Finance/algo-liquid-staking-contracts",
+        "Folks-Finance/audits"
+      ]
+    },
+    "immunefi:iop-fluid-protocol": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/iop-fluid-protocol/",
+      "maxReward": 80000,
+      "chains": [
+        "Fuel Network"
+      ],
+      "sourceRepos": [
+        "Hydrogen-Labs/fluid-protocol",
+        "trailofbits/publications"
+      ]
+    },
+    "immunefi:audit-comp-anvil-letters-of-credit": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-anvil-letters-of-credit/",
+      "maxReward": 30000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:audit-comp-anvil": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/audit-comp-anvil/",
+      "maxReward": 50000,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:gamma": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/gamma/",
+      "maxReward": 50000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:beefyfinance": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/beefyfinance/",
+      "maxReward": 75000,
+      "chains": [
+        "Polygon"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:antefinance": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/antefinance/",
+      "maxReward": 25000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "antefinance/ante-v05-core"
+      ]
+    },
+    "immunefi:shardeum-ancillaries-ii-boost": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/shardeum-ancillaries-ii-boost/",
+      "maxReward": 100000,
+      "chains": [
+        "Shardeum"
+      ],
+      "sourceRepos": [
+        "shardeum/json-rpc-server"
+      ]
+    },
+    "immunefi:shardeum-core-ii-boost": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/shardeum-core-ii-boost/",
+      "maxReward": 150000,
+      "chains": [
+        "Shardeum"
+      ],
+      "sourceRepos": [
+        "shardeum/shardeum",
+        "shardeum/shardus-core"
+      ]
+    },
+    "immunefi:boost-acre": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/boost-acre/",
+      "maxReward": 50000,
+      "chains": [],
+      "sourceRepos": [
+        "thesis/acre",
+        "Thesis-Defense/Security-Audit-Reports"
+      ]
+    },
+    "immunefi:iop-swaylend": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/iop-swaylend/",
+      "maxReward": 45000,
+      "chains": [
+        "Fuel Network"
+      ],
+      "sourceRepos": [
+        "Swaylend/swaylend-monorepo"
+      ]
+    },
+    "immunefi:dexeprotocol": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/dexeprotocol/",
+      "maxReward": 500000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "dexe-network/DeXe-Protocol"
+      ]
+    },
+    "immunefi:ichi": {
+      "status": "active",
+      "url": "https://immunefi.com/bug-bounty/ichi/",
+      "maxReward": 50000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:boost-lido": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/boost-lido/",
+      "maxReward": 100000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "mellow-finance/mellow-lrt",
+        "immunefi-team/Bounty_Boosts"
+      ]
+    },
+    "immunefi:thundernft-iop": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/thundernft-iop/",
+      "maxReward": 65000,
+      "chains": [
+        "Fuel Network"
+      ],
+      "sourceRepos": [
+        "immunefi-team/Bounty_Boosts"
+      ]
+    },
+    "immunefi:ionic-iop": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/ionic-iop/",
+      "maxReward": 6000,
+      "chains": [
+        "Base",
+        "Mode"
+      ],
+      "sourceRepos": []
+    },
+    "immunefi:hinkal-iop": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/hinkal-iop/",
+      "maxReward": 0,
+      "chains": [],
+      "sourceRepos": []
+    },
+    "immunefi:boost-idex": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/boost-idex/",
+      "maxReward": 45000,
+      "chains": [],
+      "sourceRepos": [
+        "immunefi-team/Bounty_Boosts",
+        "idexio/idex-contracts-ikon"
+      ]
+    },
+    "immunefi:shardeum-ancillaries-boost": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/shardeum-ancillaries-boost/",
+      "maxReward": 200000,
+      "chains": [
+        "Shardeum"
+      ],
+      "sourceRepos": [
+        "immunefi-team/Bounty_Boosts",
+        "shardeum/simple-network-test",
+        "shardeum/json-rpc-server"
+      ]
+    },
+    "immunefi:shardeum-core-boost": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/shardeum-core-boost/",
+      "maxReward": 500000,
+      "chains": [
+        "Shardeum"
+      ],
+      "sourceRepos": [
+        "shardeum/shardus-core",
+        "shardeum/shardeum",
+        "immunefi-team/Bounty_Boosts",
+        "shardeum/lib-crypto-utils",
+        "shardeum/simple-network-test",
+        "shardeum/json-rpc-server"
+      ]
+    },
+    "immunefi:mitigation-audit-folksfinance": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/mitigation-audit-folksfinance/",
+      "maxReward": 25000,
+      "chains": [],
+      "sourceRepos": [
+        "Folks-Finance/folks-finance-xchain-contracts",
+        "immunefi-team/Bounty_Boosts",
+        "Folks-Finance/audits"
+      ]
+    },
+    "immunefi:folksfinance-boost": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/folksfinance-boost/",
+      "maxReward": 100000,
+      "chains": [],
+      "sourceRepos": [
+        "immunefi-team/Bounty_Boosts",
+        "Folks-Finance/folks-finance-xchain-contracts",
+        "Folks-Finance/audits"
+      ]
+    },
+    "immunefi:alchemix-boost": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/alchemix-boost/",
+      "maxReward": 125000,
+      "chains": [],
+      "sourceRepos": [
+        "immunefi-team/Bounty_Boosts",
+        "alchemix-finance/alchemix-v2-dao"
+      ]
+    },
+    "immunefi:zerolend-boost": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/zerolend-boost/",
+      "maxReward": 200000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "zerolend/governance",
+        "immunefi-team/Bounty_Boosts"
+      ]
+    },
+    "immunefi:immunefiarbitration-boost": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/immunefiarbitration-boost/",
+      "maxReward": 30000,
+      "chains": [],
+      "sourceRepos": [
+        "immunefi-team/vaults",
+        "immunefi-team/Bounty_Boosts"
+      ]
+    },
+    "immunefi:pufferfinance-boost": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/pufferfinance-boost/",
+      "maxReward": 200000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "PufferFinance/pufETH",
+        "slowmist/Knowledge-Base",
+        "blocksecteam/audit-reports",
+        "immunefi-team/Bounty_Boosts"
+      ]
+    },
+    "immunefi:ebtc-boost": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/ebtc-boost/",
+      "maxReward": 200000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "ebtc-protocol/ebtc",
+        "code-423n4/2023-10-badger",
+        "transmissions11/solmate",
+        "lidofinance/lido-dao",
+        "code-423n4/2023-10-badger-findings",
+        "Risk-DAO/Reports",
+        "immunefi-team/Bounty_Boosts"
+      ]
+    },
+    "immunefi:boosteddegatebugbounty": {
+      "status": "inactive",
+      "url": "https://immunefi.com/bug-bounty/boosteddegatebugbounty/",
+      "maxReward": 400000,
+      "chains": [
+        "ETH"
+      ],
+      "sourceRepos": [
+        "degatedev/protocols",
+        "immunefi-team/Bounty_Boosts"
+      ]
+    }
+  },
+  "targets": {
+    "immunefi:aave:aave-dao/aave-v3-origin": {
+      "programId": "immunefi:aave",
+      "repository": "aave-dao/aave-v3-origin",
+      "ref": "v3.3.0",
+      "score": 61
+    },
+    "immunefi:aave:smartcontractkit/ccip": {
+      "programId": "immunefi:aave",
+      "repository": "smartcontractkit/ccip",
+      "ref": "v2.14.0-ccip1.5.1",
+      "score": 61
+    },
+    "immunefi:sky:Synthetixio/synthetix": {
+      "programId": "immunefi:sky",
+      "repository": "Synthetixio/synthetix",
+      "ref": "5e9096ac4aea6c4249828f1e8b95e3fb9be231f8",
+      "score": 61
+    },
+    "immunefi:optimism:ethereum-optimism/optimism": {
+      "programId": "immunefi:optimism",
+      "repository": "ethereum-optimism/optimism",
+      "ref": "6f8e432506a5f4ba094f091b22a0bb6acc53fdac",
+      "score": 60
+    },
+    "immunefi:thresholdnetwork:threshold-network/tbtc-v2": {
+      "programId": "immunefi:thresholdnetwork",
+      "repository": "threshold-network/tbtc-v2",
+      "ref": "00b4a5382df6384df3899ae1bb8b5d33b85c1411",
+      "score": 56
+    },
+    "immunefi:gmx:gmx-io/gmx-contracts": {
+      "programId": "immunefi:gmx",
+      "repository": "gmx-io/gmx-contracts",
+      "ref": "fe55c4ba8911ae2378b50bfb9bece5ee50cf2af8",
+      "score": 50
+    },
+    "immunefi:gmx:gmx-io/gmx-synthetics": {
+      "programId": "immunefi:gmx",
+      "repository": "gmx-io/gmx-synthetics",
+      "ref": "18b1a530fc08959dbbc8de62e9073e2b15931c63",
+      "score": 50
+    },
+    "immunefi:cowprotocol:cowprotocol/contracts": {
+      "programId": "immunefi:cowprotocol",
+      "repository": "cowprotocol/contracts",
+      "ref": "6ebbd810ff2da635fb6f88e9a15fde196f8c852a",
+      "score": 48
+    },
+    "immunefi:katana:agglayer/lxly-bridge-and-call": {
+      "programId": "immunefi:katana",
+      "repository": "agglayer/lxly-bridge-and-call",
+      "ref": "3826c37ea7be36eaeba8decae8ef1479203f71e7",
+      "score": 48
+    },
+    "immunefi:katana:agglayer/vault-bridge": {
+      "programId": "immunefi:katana",
+      "repository": "agglayer/vault-bridge",
+      "ref": "v1.0.0",
+      "score": 48
+    },
+    "immunefi:pancakeswap:Uniswap/v4-periphery": {
+      "programId": "immunefi:pancakeswap",
+      "repository": "Uniswap/v4-periphery",
+      "ref": "545a5d2a87228167edde48f3b9eda122d1e3c4d6",
+      "score": 46
+    },
+    "immunefi:autonolas:valory-xyz/autonolas-governance": {
+      "programId": "immunefi:autonolas",
+      "repository": "valory-xyz/autonolas-governance",
+      "ref": "v1.2.5",
+      "score": 45
+    },
+    "immunefi:autonolas:valory-xyz/autonolas-marketplace": {
+      "programId": "immunefi:autonolas",
+      "repository": "valory-xyz/autonolas-marketplace",
+      "ref": "v0.4.2",
+      "score": 45
+    },
+    "immunefi:autonolas:valory-xyz/autonolas-registries": {
+      "programId": "immunefi:autonolas",
+      "repository": "valory-xyz/autonolas-registries",
+      "ref": "v1.3.3",
+      "score": 45
+    },
+    "immunefi:autonolas:valory-xyz/autonolas-tokenomics": {
+      "programId": "immunefi:autonolas",
+      "repository": "valory-xyz/autonolas-tokenomics",
+      "ref": "v1.4.3",
+      "score": 45
+    },
+    "immunefi:fluxfinance:compound-finance/compound-protocol": {
+      "programId": "immunefi:fluxfinance",
+      "repository": "compound-finance/compound-protocol",
+      "ref": "a3214f67b73310d547e00fc578e8355911c9d376",
+      "score": 42
+    },
+    "immunefi:zksyncera:matter-labs/era-contracts": {
+      "programId": "immunefi:zksyncera",
+      "repository": "matter-labs/era-contracts",
+      "ref": "492671af657801b6a06215453ca71408b7d25b71",
+      "score": 42
+    },
+    "immunefi:zksyncera:matter-labs/zksync-protocol": {
+      "programId": "immunefi:zksyncera",
+      "repository": "matter-labs/zksync-protocol",
+      "ref": "2a2ecb3bfcccc46758826d3b0d11933b95e511be",
+      "score": 42
+    },
+    "immunefi:polygon:0xPolygon/sPOL-contracts": {
+      "programId": "immunefi:polygon",
+      "repository": "0xPolygon/sPOL-contracts",
+      "ref": "1.0.0",
+      "score": 39
+    },
+    "immunefi:ssvnetwork:ssvlabs/ssv-network": {
+      "programId": "immunefi:ssvnetwork",
+      "repository": "ssvlabs/ssv-network",
+      "ref": "v2.0.0",
+      "score": 38
+    },
+    "immunefi:plether:immunefi-team/audit-comp-plether": {
+      "programId": "immunefi:plether",
+      "repository": "immunefi-team/audit-comp-plether",
+      "ref": "a82d4fefb02768e5b3bddcc97dee371eee24fea8",
+      "score": 37
+    },
+    "immunefi:plether:Plether-Fi/plether-core": {
+      "programId": "immunefi:plether",
+      "repository": "Plether-Fi/plether-core",
+      "ref": "v2.0.0",
+      "score": 37
+    },
+    "immunefi:onre:onre-finance/onre-sol": {
+      "programId": "immunefi:onre",
+      "repository": "onre-finance/onre-sol",
+      "ref": "b1d24ca734b64d60ac72b06f2b69bd10f8aa4d9f",
+      "score": 34
+    },
+    "immunefi:openzeppelin:OpenZeppelin/uniswap-hooks": {
+      "programId": "immunefi:openzeppelin",
+      "repository": "OpenZeppelin/uniswap-hooks",
+      "ref": "2c39623ce5a5103bd314f1380df0443df2523149",
+      "score": 26
+    },
+    "immunefi:horizen:HorizenOfficial/staker": {
+      "programId": "immunefi:horizen",
+      "repository": "HorizenOfficial/staker",
+      "ref": "bc369be9acf7c76906cc837e4eabc9eada44be4d",
+      "score": 25
+    }
+  },
+  "findings": {}
+}

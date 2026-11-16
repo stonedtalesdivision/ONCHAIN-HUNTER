@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "phase-14",
+  "generatedAt": "2026-11-16T04:02:55.319Z",
+  "humanReviewOnly": true,
+  "submissionEnabled": false,
+  "summary": {
+    "total": 0,
+    "blocked": 0,
+    "readyForReview": 0,
+    "highOrCritical": 0,
+    "validationPrepared": 0,
+    "strongProof": 0
+  },
+  "items": [],
+  "reviewQueue": [],
+  "sourceArtifacts": [
+    "artifacts/hunt/latest.json",
+    "artifacts/hunt/bounty-intelligence.json",
+    "artifacts/investigations/latest.json",
+    "artifacts/investigations/orchestration.json",
+    "artifacts/validation-bundles/"
+  ]
+}
