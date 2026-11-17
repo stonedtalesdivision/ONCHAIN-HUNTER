@@ -1,17 +1,79 @@
-import {readFile,writeFile,mkdir} from "node:fs/promises";
-import {buildDisclosureReport,type DisclosureReport} from "../disclosure-report.js";
-import {loadInvestigationState} from "../investigation.js";
-import type {EvidencePackage} from "../evidence-graph.js";
-import type {BountyMatch} from "../bounty-matcher.js";
-const huntPath="artifacts/hunt/latest.json";
-const hunt=JSON.parse(await readFile(huntPath,"utf8")) as {evidencePackages?:EvidencePackage[];bountyMatches?:Array<{packageId:string;findingId:string;matches:BountyMatch[]}>};
-const packages=hunt.evidencePackages??[];const groups=hunt.bountyMatches??[];const investigation=await loadInvestigationState();await mkdir("artifacts/reports",{recursive:true});
-const reports:DisclosureReport[]=[];
-for(const group of groups){const pkg=packages.find(p=>p.packageId===group.packageId);if(!pkg)continue;
- for(const match of group.matches.filter(m=>m.scope==="exact-repository")){const report=buildDisclosureReport(pkg,match);const safe=match.programId+"-"+pkg.findingId.replace(/[^a-zA-Z0-9._-]/g,"_");
-  await writeFile("artifacts/reports/"+safe+".json",JSON.stringify(report,null,2),"utf8");await writeFile("artifacts/reports/"+safe+".md",report.markdown,"utf8");reports.push(report);}}
-const severityRank:Record<string,number>={critical:4,high:3,medium:2,low:1,informational:0};
-reports.sort((a,b)=>{const ia=investigation?.records[a.packageId]?.priority??0;const ib=investigation?.records[b.packageId]?.priority??0;return ib-ia||(severityRank[b.severity]??0)-(severityRank[a.severity]??0)||b.confidence-a.confidence;});
-const reviewQueue={schemaVersion:"phase-9",generatedAt:new Date().toISOString(),submissionEnabled:false,totalReports:reports.length,priorityOrder:"investigation-priority-desc",reports:reports.map((r,index)=>({priority:index+1,investigationPriority:investigation?.records[r.packageId]?.priority??0,revisionChanged:investigation?.records[r.packageId]?.revisionChanged??false,missingEvidence:investigation?.records[r.packageId]?.missingEvidence??[],packageId:r.packageId,findingId:r.findingId,programId:r.program.id,severity:r.severity,confidence:r.confidence,scope:r.bounty.scope,validation:r.validation.status,reviewBlockers:r.reviewBlockers,submissionReady:r.submissionReady}))};
-await writeFile("artifacts/hunt/review-queue.json",JSON.stringify(reviewQueue,null,2),"utf8");
-console.log(JSON.stringify({status:"generated",reports:reports.length,reviewQueue:"artifacts/hunt/review-queue.json"},null,2));
+import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { buildDisclosureReport, type DisclosureReport } from "../disclosure-report.js";
+import { loadInvestigationState } from "../investigation.js";
+import type { EvidencePackage } from "../evidence-graph.js";
+import type { BountyMatch } from "../bounty-matcher.js";
+
+function safeFilename(id: string, maxLen = 100): string {
+  const clean = id.replace(/[^a-zA-Z0-9._-]/g, "_");
+  if (clean.length <= maxLen) return clean;
+  const hash = createHash("sha256").update(id).digest("hex").slice(0, 16);
+  return `${clean.slice(0, maxLen - 17)}_${hash}`;
+}
+
+const huntPath = "artifacts/hunt/latest.json";
+const hunt = JSON.parse(await readFile(huntPath, "utf8")) as {
+  evidencePackages?: EvidencePackage[];
+  bountyMatches?: Array<{ packageId: string; findingId: string; matches: BountyMatch[] }>;
+};
+const packages = hunt.evidencePackages ?? [];
+const groups = hunt.bountyMatches ?? [];
+const investigation = await loadInvestigationState();
+await mkdir("artifacts/reports", { recursive: true });
+const reports: DisclosureReport[] = [];
+
+for (const group of groups) {
+  const pkg = packages.find(p => p.packageId === group.packageId);
+  if (!pkg) continue;
+  for (const match of group.matches.filter(m => m.scope === "exact-repository")) {
+    const report = buildDisclosureReport(pkg, match);
+    const safe = safeFilename(`${match.programId}-${pkg.findingId}`, 100);
+    await writeFile("artifacts/reports/" + safe + ".json", JSON.stringify(report, null, 2), "utf8");
+    await writeFile("artifacts/reports/" + safe + ".md", report.markdown, "utf8");
+    reports.push(report);
+  }
+}
+
+const severityRank: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1, informational: 0 };
+reports.sort((a, b) => {
+  const ia = investigation?.records[a.packageId]?.priority ?? 0;
+  const ib = investigation?.records[b.packageId]?.priority ?? 0;
+  return (
+    ib - ia ||
+    (severityRank[b.severity] ?? 0) - (severityRank[a.severity] ?? 0) ||
+    b.confidence - a.confidence
+  );
+});
+
+const reviewQueue = {
+  schemaVersion: "phase-9",
+  generatedAt: new Date().toISOString(),
+  submissionEnabled: false,
+  totalReports: reports.length,
+  priorityOrder: "investigation-priority-desc",
+  reports: reports.map((r, index) => ({
+    priority: index + 1,
+    investigationPriority: investigation?.records[r.packageId]?.priority ?? 0,
+    revisionChanged: investigation?.records[r.packageId]?.revisionChanged ?? false,
+    missingEvidence: investigation?.records[r.packageId]?.missingEvidence ?? [],
+    packageId: r.packageId,
+    findingId: r.findingId,
+    programId: r.program.id,
+    severity: r.severity,
+    confidence: r.confidence,
+    scope: r.bounty.scope,
+    validation: r.validation.status,
+    reviewBlockers: r.reviewBlockers,
+    submissionReady: r.submissionReady,
+  })),
+};
+
+await writeFile("artifacts/hunt/review-queue.json", JSON.stringify(reviewQueue, null, 2), "utf8");
+console.log(
+  JSON.stringify(
+    { status: "generated", reports: reports.length, reviewQueue: "artifacts/hunt/review-queue.json" },
+    null,
+    2
+  )
+);

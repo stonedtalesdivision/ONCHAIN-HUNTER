@@ -38,8 +38,9 @@ interface AnalysisStats {
 // Constants
 // ---------------------------------------------------------------------------
 
+const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-1.5-flash";
 const GEMINI_ENDPOINT =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+  `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 const MAX_REQUESTS_PER_MINUTE = 15;
 const REQUEST_TIMEOUT_MS = 30_000;
 
